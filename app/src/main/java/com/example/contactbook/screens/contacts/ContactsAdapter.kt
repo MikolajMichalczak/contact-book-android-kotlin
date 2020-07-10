@@ -1,0 +1,120 @@
+package com.example.contactbook.screens.contacts
+
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.contactbook.database.entities.Contact
+import com.example.contactbook.database.entities.ContactExtras
+import com.example.contactbook.databinding.ContactsListItemBinding
+import kotlinx.android.synthetic.main.contacts_list_item.view.*
+
+class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener: (Contact) -> Unit)
+    : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
+
+
+    private var list: List<Contact> = emptyList()
+    private var extrasList: List<ContactExtras> = emptyList()
+
+    companion object : DiffUtil.ItemCallback<Contact>() {
+        override fun areItemsTheSame(oldItem: Contact, newItem: Contact): Boolean {
+            return  oldItem === newItem
+        }
+
+        override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean {
+            return  oldItem.id == newItem.id
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ContactsListItemBinding.inflate(inflater, parent, false)
+        return ContactViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
+        val contact: Contact = list[position]
+        holder.bind(contact)
+    }
+
+    override fun getItemCount(): Int {
+        return list.size
+    }
+
+    fun getContactAt(position:Int): Contact {
+        return list[position]
+    }
+
+    fun setList(contactsList: List<Contact>){
+        list = contactsList
+        Log.i("ContactsAdapter", list.toString())
+        notifyDataSetChanged()
+    }
+
+    fun setSecondList(contactsExtrasList: List<ContactExtras>){
+        extrasList = contactsExtrasList
+        Log.i("ContactsAdapter", extrasList.toString())
+        //notifyDataSetChanged()
+    }
+
+    inner class ContactViewHolder(private val binding: ContactsListItemBinding) :
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+        private var nameView: TextView? = null
+        private var contactView: TextView? = null
+        private var contact: Contact? = null
+        private var extras: List<ContactExtras> = emptyList()
+        private lateinit var secondList: RecyclerView
+
+
+        init {
+            nameView = itemView.contact_name
+            contactView= itemView.contact_number
+            itemView.setOnClickListener(this)
+        }
+
+        private fun chooseExtras(contact: Contact) {
+
+            extras = extrasList.filter{it -> it.contactOwnerId == contact.id}
+        }
+
+        fun bind(contact: Contact) {
+            binding.contactName.tag = contact.id
+            binding.contactName.text = contact.name
+            binding.contactNumber.text = contact.number
+            this.contact = contact
+            secondList = binding.contactsSecondList
+            chooseExtras(contact)
+
+            var _adapter = ContactsExtrasAdapter{contactExtras: ContactExtras ->
+                listenerExtras(contactExtras)
+            }
+
+            secondList.apply{
+                layoutManager = LinearLayoutManager(itemView.context)
+                adapter = _adapter
+                (adapter as ContactsExtrasAdapter).setList(extras)
+            }
+
+            binding.editContactButton.setOnClickListener(){
+                listener(contact)
+            }
+
+        }
+
+        override fun onClick(p0: View?) {
+           contact?.let {
+               if(binding.contactsSecondList.visibility == View.GONE)
+                   binding.contactsSecondList.visibility = View.VISIBLE
+               else
+                   binding.contactsSecondList.visibility = View.GONE
+           }
+        }
+    }
+}
+
+
+

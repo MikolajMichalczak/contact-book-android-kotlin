@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ContactBook</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="no_contacts">No contacts</string>
+    <string name="remove_contacts">Remove all contacts</string>
+    <string name="sort_contacts">Sort contacts</string>
+    <string name="add_contact">Add contact</string>
+    <string name="update_contact">Update contact</string>
+    <string name="search_title">Search</string>
+    <string name="search_hint">Name</string>
+    <string name="button_edit_contact">Edit</string>
+</resources>

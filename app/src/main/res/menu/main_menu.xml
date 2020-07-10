@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+        <item
+            android:id="@+id/action_delete"
+            android:orderInCategory="100"
+            android:title="@string/remove_contacts"/>
+        <item
+            android:id="@+id/action_sort"
+            android:title="@string/sort_contacts"
+            app:showAsAction="never"/>
+
+        <item android:id="@+id/action_search"
+            android:title="@string/search_title"
+            android:icon="@drawable/search_icon_24"
+            app:showAsAction="ifRoom"
+            app:actionViewClass="android.widget.SearchView" />
+    </menu>
