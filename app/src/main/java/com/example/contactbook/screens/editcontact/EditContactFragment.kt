@@ -1,25 +1,44 @@
 package com.example.contactbook.screens.contacts
 
+import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.R
+import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.databinding.FragmentEditContactBinding
 import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
+import com.squareup.picasso.Picasso
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class EditContactFragment : Fragment() {
 
     companion object{
         private const val TAG = "EditContactFragment"
+        private const val STORAGEREQUEST_RESULT = 1
+        private const val CAMERAREQUEST_RESULT = 0
+        private const val CAMERA_REQUEST_CODE = 101
     }
 
     private lateinit var viewModel: EditContactViewModel
@@ -33,6 +52,8 @@ class EditContactFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_edit_contact, container, false)
+
+            setupPermissions()
 
         var contact = arguments?.getParcelable<Contact>("contact")
 
@@ -54,7 +75,143 @@ class EditContactFragment : Fragment() {
             navigateToContactsFragment(state)
         })
 
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Where to choose a photo?")
+        builder.setPositiveButton("Camera") { dialog, which ->
+            dispatchTakePictureIntent()
+        }
+
+        builder.setNegativeButton("Choose file") { dialog, which ->
+            val takePictureIntent = Intent(Intent.ACTION_PICK)
+            takePictureIntent.type = "image/*"
+            startActivityForResult(
+                takePictureIntent,
+                1
+            )
+        }
+
+        binding.contactImageView.setOnClickListener(){
+            builder.show()
+        }
+
         return binding.root
+    }
+
+    private fun setupPermissions() {
+        val permission = ContextCompat.checkSelfPermission(
+            context!!,
+            Manifest.permission.CAMERA)
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission to record denied")
+            makeRequest()
+        }
+    }
+
+    private fun makeRequest() {
+        ActivityCompat.requestPermissions(requireActivity(),
+            arrayOf(Manifest.permission.CAMERA),
+            CAMERA_REQUEST_CODE)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            CAMERA_REQUEST_CODE -> {
+
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+                    Log.i(TAG, "Permission has been denied by user")
+                } else {
+                    Log.i(TAG, "Permission has been granted by user")
+                }
+            }
+        }
+    }
+
+
+    var selectedPhotoUri: Uri? = null
+    private var currentPhotoPath: String = ""
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == CAMERAREQUEST_RESULT) {
+            Log.i(TAG, currentPhotoPath)
+            //selectedPhotoUri = Uri.fromFile(File(currentPhotoPath))
+            //Picasso.get().load(currentPhotoPath).into(binding.contactImageView)
+            //viewModel.imageUri = selectedPhotoUri
+        }
+
+        if(requestCode == STORAGEREQUEST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
+            selectedPhotoUri = data.data
+            Log.i(TAG, selectedPhotoUri.toString())
+            Picasso.get().load(selectedPhotoUri).into(binding.contactImageView)
+        }
+    }
+
+    private fun createImageFile(): File {
+    println("test")
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File? = context!!.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            currentPhotoPath = absolutePath
+        }
+    }
+
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
+                createImageFile()
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: Exception) {
+                    null
+                }
+                // Continue only if the File was successfully created
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "com.example.android.provider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, 0)
+                    //selectedPhotoUri = Uri.fromFile(File(currentPhotoPath))
+                    //Picasso.get().load(currentPhotoPath).into(binding.contactImageView)
+                }
+            }
+        }
+//        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//        if (takePictureIntent.resolveActivity(requireActivity().packageManager) != null) {
+//            try {
+//                createImageFile()
+//                val photoFile: File? = try {
+//                    createImageFile()
+//                } catch (ex: Exception) {
+//                    null
+//                }
+//                if (photoFile != null) {
+//
+//
+//                    val photoURI: Uri = FileProvider.getUriForFile(
+//                        requireContext(),
+//                        "com.example.android.provider",
+//                        photoFile
+//                    )
+//                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+//                    startActivityForResult(takePictureIntent, 0)
+//
+//                }
+//            } catch (ex: Exception) {
+//                null
+//            }
+//        }
     }
 
     private fun navigateToContactsFragment(_state: Boolean) {
@@ -63,5 +220,4 @@ class EditContactFragment : Fragment() {
             viewModel.endNavigateToContactsFragment()
         }
     }
-
 }

@@ -1,5 +1,6 @@
 package com.example.contactbook.screens.contacts
 
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.databinding.ContactsListItemBinding
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.contacts_list_item.view.*
 
 class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener: (Contact) -> Unit)
@@ -77,14 +79,14 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
         }
 
         private fun chooseExtras(contact: Contact) {
-
-            extras = extrasList.filter{it -> it.contactOwnerId == contact.id}
+            extras = extrasList.filter{it.contactOwnerId == contact.id}
         }
 
         fun bind(contact: Contact) {
             binding.contactName.tag = contact.id
             binding.contactName.text = contact.name
             binding.contactNumber.text = contact.number
+            Picasso.get().load(Uri.parse(contact.imageUri)).into(binding.contactImageView)
             this.contact = contact
             secondList = binding.contactsSecondList
             chooseExtras(contact)

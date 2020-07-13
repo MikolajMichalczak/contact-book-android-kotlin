@@ -1,11 +1,13 @@
 package com.example.contactbook.screens.editcontact
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.contactbook.R
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.ContactsRepository
 import com.example.contactbook.database.ContactsRoomDatabase
@@ -24,6 +26,7 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
     var contact = _contact
     var nameText:String = ""
     var numberText:String = ""
+    var imageUri: String = Uri.parse("android.resource://com.example.contactbook/drawable/person_icon_24.xml").toString()
 
     private var _toContactsFragment = MutableLiveData<Boolean>()
     val toContactsFragment: LiveData<Boolean>
@@ -36,14 +39,17 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
         if(contact.name.isNotEmpty()) {
             nameText = _contact.name
             numberText = contact.number
+            imageUri = contact.imageUri
         }
     }
 
     fun updateContact(){
+        Log.i(TAG, contact.toString())
         if(contact.name.isNotEmpty()) {
             if(nameText.isNotEmpty()&&numberText.isNotEmpty()) {
                 contact.name = nameText
                 contact.number = numberText
+                contact.imageUri = imageUri
                 update(contact)
                 toContactsFragment()
             }
@@ -56,7 +62,8 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
                     Contact(
                         0,
                         nameText,
-                        numberText
+                        numberText,
+                        imageUri
                     )
                 insert(newContact)
                 toContactsFragment()

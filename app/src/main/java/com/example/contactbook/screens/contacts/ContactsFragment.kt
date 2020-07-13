@@ -1,5 +1,6 @@
 package com.example.contactbook.screens.contacts
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -148,7 +149,7 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
     private fun navigateToEditContactFragment(_state: Boolean) {
         if(_state) {
             bundle.putParcelable("contact",
-                Contact(0, "", "")
+                Contact(0, "", "", Uri.parse("app/src/main/res/drawable/person_icon_24.xml").toString())
             )
             findNavController().navigate(
                 R.id.action_contactsFragment_to_editContactFragment,

@@ -11,7 +11,7 @@ import com.example.contactbook.database.entities.ContactExtras
 import kotlinx.coroutines.CoroutineScope
 
 
-@Database(entities = arrayOf(Contact::class, ContactExtras::class), version = 1, exportSchema = false)
+@Database(entities = [Contact::class, ContactExtras::class], version = 1, exportSchema = false)
 public abstract class ContactsRoomDatabase : RoomDatabase() {
 
     abstract fun contactsDao(): ContactsDao
