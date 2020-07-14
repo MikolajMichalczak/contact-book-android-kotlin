@@ -6,16 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.contactbook.R
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.databinding.ContactsListItemBinding
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.contacts_list_item.view.*
 
-class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener: (Contact) -> Unit)
+class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener: (Contact) -> Unit, val longListener: (Contact) -> Unit)
     : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
 
@@ -64,7 +66,7 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
     }
 
     inner class ContactViewHolder(private val binding: ContactsListItemBinding) :
-        RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener, View.OnLongClickListener {
         private var nameView: TextView? = null
         private var contactView: TextView? = null
         private var contact: Contact? = null
@@ -76,6 +78,7 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
             nameView = itemView.contact_name
             contactView= itemView.contact_number
             itemView.setOnClickListener(this)
+            itemView.setOnLongClickListener(this)
         }
 
         private fun chooseExtras(contact: Contact) {
@@ -86,7 +89,15 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
             binding.contactName.tag = contact.id
             binding.contactName.text = contact.name
             binding.contactNumber.text = contact.number
-            Picasso.get().load(Uri.parse(contact.imageUri)).into(binding.contactImageView)
+            if(contact.imageUri.isBlank()){
+                binding.contactImageView.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.person_icon_24))
+            }
+            else
+                Picasso.get().load(Uri.parse(contact.imageUri)).placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24).into(binding.contactImageView)
+            if(contact.favourite == 1)
+                binding.favouriteImage.visibility = View.VISIBLE
+            else
+                binding.favouriteImage.visibility = View.INVISIBLE
             this.contact = contact
             secondList = binding.contactsSecondList
             chooseExtras(contact)
@@ -109,11 +120,19 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
 
         override fun onClick(p0: View?) {
            contact?.let {
+               Log.i("ContactsAdapter", contact.toString())
                if(binding.contactsSecondList.visibility == View.GONE)
                    binding.contactsSecondList.visibility = View.VISIBLE
                else
                    binding.contactsSecondList.visibility = View.GONE
            }
+        }
+
+        override fun onLongClick(p0: View?): Boolean {
+            contact?.let{
+                longListener(it)
+            }
+            return true
         }
     }
 }

@@ -25,7 +25,7 @@
             android:padding="5dp"
             android:text="Name"
             android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/edit_contact_button"
+            app:layout_constraintEnd_toStartOf="@+id/favourite_image"
             app:layout_constraintStart_toEndOf="@+id/contact_image_view"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -69,11 +69,26 @@
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             app:layout_constraintBottom_toBottomOf="@+id/contact_number"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/contact_name"
             app:srcCompat="@drawable/person_icon_24"
+            android:scaleType="centerCrop"
             tools:srcCompat="@tools:sample/avatars" />
+
+        <ImageView
+            android:id="@+id/favourite_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/edit_contact_button"
+            app:layout_constraintEnd_toStartOf="@+id/edit_contact_button"
+            app:layout_constraintTop_toTopOf="@+id/edit_contact_button"
+            app:srcCompat="@drawable/star_icon_yellow_24" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,4 +26,7 @@ interface  ContactsDao {
     @Update
     fun updateContact(contact: Contact)
 
+    @Query("SELECT * from contacts_table where favourite = 1")
+    fun getFavouriteContacts(): LiveData<List<Contact>>
+
 }

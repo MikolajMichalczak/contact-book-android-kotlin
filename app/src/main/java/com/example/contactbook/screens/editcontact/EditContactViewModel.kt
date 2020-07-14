@@ -7,7 +7,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.contactbook.R
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.ContactsRepository
 import com.example.contactbook.database.ContactsRoomDatabase
@@ -26,11 +25,14 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
     var contact = _contact
     var nameText:String = ""
     var numberText:String = ""
-    var imageUri: String = Uri.parse("android.resource://com.example.contactbook/drawable/person_icon_24.xml").toString()
 
     private var _toContactsFragment = MutableLiveData<Boolean>()
     val toContactsFragment: LiveData<Boolean>
     get() = _toContactsFragment
+
+    var _imageUri = MutableLiveData<String>()
+    val imageUri: LiveData<String>
+        get() = _imageUri
 
     init {
         val contactsDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsDao()
@@ -39,7 +41,10 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
         if(contact.name.isNotEmpty()) {
             nameText = _contact.name
             numberText = contact.number
-            imageUri = contact.imageUri
+            _imageUri.value = contact.imageUri
+        }
+        else{
+            _imageUri.value = ""
         }
     }
 
@@ -49,7 +54,7 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
             if(nameText.isNotEmpty()&&numberText.isNotEmpty()) {
                 contact.name = nameText
                 contact.number = numberText
-                contact.imageUri = imageUri
+                contact.imageUri = _imageUri.value.toString()
                 update(contact)
                 toContactsFragment()
             }
@@ -63,7 +68,8 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
                         0,
                         nameText,
                         numberText,
-                        imageUri
+                        imageUri.value.toString(),
+                        0
                     )
                 insert(newContact)
                 toContactsFragment()

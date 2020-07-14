@@ -18,8 +18,12 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
 
     private val repository: ContactsRepository
 
-    var allContacts: LiveData<List<Contact>>
+    private var allContacts: LiveData<List<Contact>>
     var allContactsExtras: LiveData<List<ContactExtras>>
+    private val allFavouriteContacts: LiveData<List<Contact>>
+
+    val contacts = MediatorLiveData<List<Contact>>()
+    private var currentType = "notFavourite"
 
     private var _toEditContactFragment = MutableLiveData<Boolean>()
     val toEditContactFragment: LiveData<Boolean>
@@ -32,7 +36,24 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
         repository = ContactsRepository(contactsDao,contactsExtrasDao)
         allContacts = repository.allContacts
         allContactsExtras = repository.allContactsExtras
+        allFavouriteContacts = repository.allFavouriteContats
+
+        contacts.addSource(allContacts) { result ->
+            if (currentType == "notFavourite") {
+                result?.let { contacts.value = it }
+            }
+        }
+        contacts.addSource(allFavouriteContacts) { result ->
+            if (currentType == "favourite") {
+                result?.let { contacts.value = it }
+            }
+        }
     }
+
+    fun setContactsType(type: String) = when (type) {
+        "favourite" -> allFavouriteContacts.value?.let { contacts.value = it }
+        else -> allContacts.value?.let { contacts.value = it }
+    }.also { currentType = type }
 
     fun removeContacts() = viewModelScope.launch(Dispatchers.IO) {
         repository.deleteAll()
@@ -44,17 +65,6 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
 
     fun deleteContact(contact: Contact) = viewModelScope.launch(Dispatchers.IO) {
         repository.deleteContact(contact)
-        //updateLists()
-    }
-
-//    private fun updateLists() = viewModelScope.launch(Dispatchers.IO) {
-//        allContactsExtras = repository.allContactsExtras
-//        allContacts = repository.allContacts
-//
-//    }
-
-    fun deleteContactExtras(contactExtras: ContactExtras) = viewModelScope.launch(Dispatchers.IO) {
-        repository.deleteContactExtras(contactExtras)
     }
 
     fun toEditContactFragment(){
@@ -63,6 +73,10 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
 
     fun endNavigateToEditContactFragment(){
         _toEditContactFragment.value = false
+    }
+
+    fun update(contact: Contact)= viewModelScope.launch(Dispatchers.IO) {
+        repository.updateContact(contact)
     }
 
     override fun onCleared() {

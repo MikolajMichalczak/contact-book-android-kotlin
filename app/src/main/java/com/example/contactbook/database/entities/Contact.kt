@@ -8,4 +8,4 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 @Entity(tableName = "contacts_table")
-data class Contact(@PrimaryKey(autoGenerate = true) val id: Int, var name: String, var number: String, var imageUri: String) : Parcelable
+data class Contact(@PrimaryKey(autoGenerate = true) val id: Int, var name: String, var number: String, var imageUri: String, var favourite: Int) : Parcelable

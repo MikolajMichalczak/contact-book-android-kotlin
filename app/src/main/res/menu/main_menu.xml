@@ -15,4 +15,9 @@
             android:icon="@drawable/search_icon_24"
             app:showAsAction="ifRoom"
             app:actionViewClass="android.widget.SearchView" />
+
+        <item android:id="@+id/fav_button"
+            android:title="favourite"
+            android:icon="@drawable/star_icon_white_24"
+            app:showAsAction="ifRoom"/>
     </menu>

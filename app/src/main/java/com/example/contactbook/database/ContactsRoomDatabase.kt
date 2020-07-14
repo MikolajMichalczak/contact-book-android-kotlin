@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.contactbook.database.daos.ContactsDao
 import com.example.contactbook.database.daos.ContactsExtrasDao
 import com.example.contactbook.database.entities.Contact
@@ -11,7 +13,7 @@ import com.example.contactbook.database.entities.ContactExtras
 import kotlinx.coroutines.CoroutineScope
 
 
-@Database(entities = [Contact::class, ContactExtras::class], version = 1, exportSchema = false)
+@Database(entities = [Contact::class, ContactExtras::class], version = 2, exportSchema = false)
 public abstract class ContactsRoomDatabase : RoomDatabase() {
 
     abstract fun contactsDao(): ContactsDao
@@ -51,7 +53,8 @@ public abstract class ContactsRoomDatabase : RoomDatabase() {
 
 //            val MIGRATION_1_2: Migration = object : Migration(1, 2) {
 //                override fun migrate(database: SupportSQLiteDatabase) {
-//                    database.execSQL("CREATE TABLE contacts_extras_table (id INTEGER NOT NULL, email TEXT NOT NULL, address TEXT NOT NULL, PRIMARY KEY(id))");
+//                    database.execSQL("ALTER TABLE contacts_table "
+//                            + " ADD COLUMN favourite INTEGER");
 //                }
 //            }
 

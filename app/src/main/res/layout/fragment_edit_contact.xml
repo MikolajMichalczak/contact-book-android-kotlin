@@ -57,6 +57,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginBottom="32dp"
+            android:scaleType="centerCrop"
             android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/editTextNumber"
             app:layout_constraintEnd_toEndOf="@+id/editTextNumber"

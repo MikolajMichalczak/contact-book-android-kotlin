@@ -12,6 +12,7 @@ class ContactsRepository (private val contactsDao: ContactsDao, private val cont
     val allContactsExtras: LiveData<List<ContactExtras>> = contactsExtrasDao.getExtras()
 
     val allAlphabetizedContacts: LiveData<List<Contact>> = contactsDao.getAlphabetizedNames()
+    val allFavouriteContats: LiveData<List<Contact>> = contactsDao.getFavouriteContacts()
 
     //contacts
     /**

@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -44,6 +45,7 @@ class EditContactFragment : Fragment() {
     private lateinit var viewModel: EditContactViewModel
     private lateinit var binding: FragmentEditContactBinding
     private lateinit var viewModelFactory: EditContactViewModelFactory
+    private lateinit var contact: Contact
 
 
     override fun onCreateView(
@@ -55,7 +57,7 @@ class EditContactFragment : Fragment() {
 
             setupPermissions()
 
-        var contact = arguments?.getParcelable<Contact>("contact")
+        contact = arguments?.getParcelable("contact")!!
 
         viewModelFactory =
             EditContactViewModelFactory(
@@ -75,6 +77,12 @@ class EditContactFragment : Fragment() {
             navigateToContactsFragment(state)
         })
 
+        viewModel.imageUri.observe(viewLifecycleOwner, Observer {uri ->
+            if(uri.isBlank())
+                binding.contactImageView.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.person_icon_24))
+            else
+                Picasso.get().load(uri).placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24).into(binding.contactImageView)
+        })
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Where to choose a photo?")
@@ -83,7 +91,7 @@ class EditContactFragment : Fragment() {
         }
 
         builder.setNegativeButton("Choose file") { dialog, which ->
-            val takePictureIntent = Intent(Intent.ACTION_PICK)
+            val takePictureIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             takePictureIntent.type = "image/*"
             startActivityForResult(
                 takePictureIntent,
@@ -139,15 +147,22 @@ class EditContactFragment : Fragment() {
 
         if (requestCode == CAMERAREQUEST_RESULT) {
             Log.i(TAG, currentPhotoPath)
-            //selectedPhotoUri = Uri.fromFile(File(currentPhotoPath))
-            //Picasso.get().load(currentPhotoPath).into(binding.contactImageView)
-            //viewModel.imageUri = selectedPhotoUri
+            selectedPhotoUri = Uri.fromFile(File(currentPhotoPath))
+            Picasso.get().load(selectedPhotoUri).into(binding.contactImageView)
+            viewModel._imageUri.value = selectedPhotoUri.toString()
         }
 
         if(requestCode == STORAGEREQUEST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
-            Log.i(TAG, selectedPhotoUri.toString())
-            Picasso.get().load(selectedPhotoUri).into(binding.contactImageView)
+            //Log.i(TAG, selectedPhotoUri.toString())
+            Picasso.get().load(selectedPhotoUri).fit().centerCrop()
+                .placeholder(R.drawable.person_icon_24).into(binding.contactImageView)
+            viewModel._imageUri.value = selectedPhotoUri.toString()
+        }
+        else if(resultCode == Activity.RESULT_CANCELED ){
+            Picasso.get().load(Uri.parse(contact.imageUri)).fit().centerCrop()
+                .placeholder(R.drawable.person_icon_24).into(binding.contactImageView)
+            viewModel._imageUri.value = contact.imageUri
         }
     }
 
@@ -182,36 +197,9 @@ class EditContactFragment : Fragment() {
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(takePictureIntent, 0)
-                    //selectedPhotoUri = Uri.fromFile(File(currentPhotoPath))
-                    //Picasso.get().load(currentPhotoPath).into(binding.contactImageView)
                 }
             }
         }
-//        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        if (takePictureIntent.resolveActivity(requireActivity().packageManager) != null) {
-//            try {
-//                createImageFile()
-//                val photoFile: File? = try {
-//                    createImageFile()
-//                } catch (ex: Exception) {
-//                    null
-//                }
-//                if (photoFile != null) {
-//
-//
-//                    val photoURI: Uri = FileProvider.getUriForFile(
-//                        requireContext(),
-//                        "com.example.android.provider",
-//                        photoFile
-//                    )
-//                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-//                    startActivityForResult(takePictureIntent, 0)
-//
-//                }
-//            } catch (ex: Exception) {
-//                null
-//            }
-//        }
     }
 
     private fun navigateToContactsFragment(_state: Boolean) {

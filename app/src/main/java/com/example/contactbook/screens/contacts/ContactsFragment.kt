@@ -1,11 +1,14 @@
 package com.example.contactbook.screens.contacts
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -31,6 +34,8 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var bundle: Bundle
     private lateinit var contactsListForSearch: List<Contact>
     private lateinit var _adapter: ContactsAdapter
+    private lateinit var contactsType:String
+    private lateinit var menu: Menu
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +50,7 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         val searchItem = menu.findItem(R.id.action_search)
         val searchView: SearchView = searchItem.actionView as SearchView
         searchView.setOnQueryTextListener(this)
-
+        this.menu = menu
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -84,6 +89,10 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
             Toast.makeText(activity, "Sorted", Toast.LENGTH_SHORT).show()
         }
 
+        if (id == R.id.fav_button){
+            changeStar()
+        }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -92,33 +101,66 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-            binding = DataBindingUtil.inflate(
-                inflater, R.layout.fragment_contacts, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater, R.layout.fragment_contacts, container, false)
 
-            viewModel = ViewModelProvider(this).get(ContactsViewModel::class.java)
-            binding.viewModel = viewModel
-            binding.lifecycleOwner = this
+        viewModel = ViewModelProvider(this).get(ContactsViewModel::class.java)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
-            var contactList = binding.contactsList
+        var contactList = binding.contactsList
+        contactsType = "notFavourite"
 
-                _adapter = ContactsAdapter(listenerExtras = {contactExtras->
-                Log.i(TAG, contactExtras.toString())
-                bundle.putParcelable("contactExtras", contactExtras)
-                findNavController().navigate(R.id.action_contactsFragment_to_extrasFragment, bundle) },
+        val builder = AlertDialog.Builder(requireContext())
 
-                listener = {contact ->
-                    bundle.putParcelable("contact", contact)
-                    findNavController().navigate(R.id.action_contactsFragment_to_editContactFragment, bundle)
-                })
+        _adapter = ContactsAdapter(
+            listenerExtras = {contactExtras->
+            Log.i(TAG, contactExtras.toString())
+            bundle.putParcelable("contactExtras", contactExtras)
+            findNavController().navigate(R.id.action_contactsFragment_to_extrasFragment, bundle) },
 
-            contactList.apply{
-                layoutManager = LinearLayoutManager(activity)
-                adapter = _adapter
+            listener = {contact ->
+                bundle.putParcelable("contact", contact)
+                findNavController().navigate(R.id.action_contactsFragment_to_editContactFragment, bundle) },
+
+            longListener = {contact ->
+                if(contact.favourite == 0) {
+                    builder.setTitle("Do you want to make contact favourite?")
+                    builder.setPositiveButton("Yes") { dialog, which ->
+                        contact.favourite = 1
+                        viewModel.update(contact)
+                        Log.i(TAG, contact.toString())
+                    }
+
+                    builder.setNegativeButton("Cancel") { dialog, which ->
+                        //
+                    }
+                }
+                else{
+                    builder.setTitle("Do you want to make contact not favourite?")
+                    builder.setPositiveButton("Yes") { dialog, which ->
+                        contact.favourite = 0
+                        viewModel.update(contact)
+                        Log.i(TAG, contact.toString())
+                    }
+
+                    builder.setNegativeButton("Cancel") { dialog, which ->
+                        //
+                    }
+                }
+                builder.show()
             }
+        )
+
+        contactList.apply{
+            layoutManager = LinearLayoutManager(activity)
+            adapter = _adapter
+        }
 
         val swipeToDeleteCallback = object : SwipeToDeleteCallback() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 viewModel.deleteContact(_adapter.getContactAt(viewHolder.adapterPosition))
+                //_adapter.notifyItemChanged(viewHolder.adapterPosition)
             }
         }
 
@@ -130,7 +172,7 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
                 _adapter.setSecondList(extrasList)
             })
 
-            viewModel.allContacts.observe(viewLifecycleOwner, Observer { contactsList->
+            viewModel.contacts.observe(viewLifecycleOwner, Observer { contactsList->
                 contactsListForSearch = contactsList
                 _adapter.setList(contactsList)
                 if(contactList.adapter?.itemCount == 0)
@@ -146,10 +188,23 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
             return binding.root
         }
 
+    private fun changeStar(){
+        if(contactsType=="notFavourite") {
+            contactsType = "favourite"
+            viewModel.setContactsType(contactsType)
+            menu.getItem(2).setIcon(ContextCompat.getDrawable(context!!, R.drawable.star_icon_yellow_24));
+        }
+        else{
+            contactsType = "notFavourite"
+            viewModel.setContactsType(contactsType)
+            menu.getItem(2).setIcon(ContextCompat.getDrawable(context!!, R.drawable.star_icon_white_24));
+        }
+    }
+
     private fun navigateToEditContactFragment(_state: Boolean) {
         if(_state) {
             bundle.putParcelable("contact",
-                Contact(0, "", "", Uri.parse("app/src/main/res/drawable/person_icon_24.xml").toString())
+                Contact(0, "", "", "", 0)
             )
             findNavController().navigate(
                 R.id.action_contactsFragment_to_editContactFragment,
