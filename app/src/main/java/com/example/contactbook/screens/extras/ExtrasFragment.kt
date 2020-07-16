@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.contactbook.MyPagerAdapter
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.R
 import com.example.contactbook.database.entities.ContactExtras
@@ -18,6 +19,8 @@ import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
 import com.example.contactbook.screens.extras.ExtrasViewModel
 import com.example.contactbook.screens.extras.ExtrasViewModelFactory
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_contacts.*
 
 class ExtrasFragment : Fragment() {
 

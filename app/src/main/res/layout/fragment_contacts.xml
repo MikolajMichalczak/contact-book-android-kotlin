@@ -50,5 +50,6 @@
             app:srcCompat="@drawable/add_icon"
             android:onClickListener="@{() -> viewModel.toEditContactFragment()}"/>
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

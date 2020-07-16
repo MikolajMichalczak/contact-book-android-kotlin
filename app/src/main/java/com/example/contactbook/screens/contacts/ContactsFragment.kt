@@ -1,8 +1,6 @@
 package com.example.contactbook.screens.contacts
 
 import android.app.AlertDialog
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -17,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.contactbook.MainActivity
 import com.example.contactbook.R
 import com.example.contactbook.SwipeToDeleteCallback
 import com.example.contactbook.database.entities.Contact

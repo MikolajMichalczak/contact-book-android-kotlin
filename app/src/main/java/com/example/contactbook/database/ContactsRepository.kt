@@ -5,6 +5,8 @@ import com.example.contactbook.database.daos.ContactsDao
 import com.example.contactbook.database.daos.ContactsExtrasDao
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
+import com.example.contactbook.network.RepoApi
+import com.example.contactbook.network.RepoApiService
 
 class ContactsRepository (private val contactsDao: ContactsDao, private val contactsExtrasDao: ContactsExtrasDao) {
 
