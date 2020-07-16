@@ -18,18 +18,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewPager = findViewById(R.id.viewpager_main) as ViewPager2
-        viewPager!!.adapter = MyPagerAdapter(supportFragmentManager, lifecycle)
-        viewPager!!.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-
-        val tabLayout = findViewById<TabLayout>(R.id.tabs_main)
-        TabLayoutMediator(tabLayout, viewPager!!) { tab, position ->
-            when (position) {
-                0 -> tab.text = "Contacts"
-                1 -> tab.text = "Repositories"
-            }
-        }.attach()
     }
-
 
 }

@@ -64,7 +64,7 @@ class ExtrasFragment : Fragment() {
 
     private fun navigateToContactsFragment(_state: Boolean) {
         if(_state) {
-            findNavController().navigate(R.id.action_extrasFragment_to_contactsFragment)
+            findNavController().navigate(R.id.action_extrasFragment_to_pageContainerFragment2)
             viewModel.endNavigateToContactsFragment()
         }
     }

@@ -116,11 +116,11 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
             listenerExtras = {contactExtras->
             Log.i(TAG, contactExtras.toString())
             bundle.putParcelable("contactExtras", contactExtras)
-            findNavController().navigate(R.id.action_contactsFragment_to_extrasFragment, bundle) },
+            findNavController().navigate(R.id.action_pageContainerFragment_to_extrasFragment2, bundle) },
 
             listener = {contact ->
                 bundle.putParcelable("contact", contact)
-                findNavController().navigate(R.id.action_contactsFragment_to_editContactFragment, bundle) },
+                findNavController().navigate(R.id.action_pageContainerFragment_to_editContactFragment, bundle) },
 
             longListener = {contact ->
                 if(contact.favourite == 0) {
@@ -159,7 +159,6 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         val swipeToDeleteCallback = object : SwipeToDeleteCallback() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 viewModel.deleteContact(_adapter.getContactAt(viewHolder.adapterPosition))
-                //_adapter.notifyItemChanged(viewHolder.adapterPosition)
             }
         }
 
@@ -206,8 +205,7 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
                 Contact(0, "", "", "", 0)
             )
             findNavController().navigate(
-                R.id.action_contactsFragment_to_editContactFragment,
-                bundle
+                R.id.action_pageContainerFragment_to_editContactFragment,bundle
             )
             viewModel.endNavigateToEditContactFragment()
         }

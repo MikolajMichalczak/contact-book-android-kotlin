@@ -51,5 +51,6 @@
             android:onClickListener="@{() -> viewModel.toEditContactFragment()}"/>
 
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -204,7 +204,7 @@ class EditContactFragment : Fragment() {
 
     private fun navigateToContactsFragment(_state: Boolean) {
         if(_state) {
-            findNavController().navigate(R.id.action_editContactFragment_to_contactsFragment)
+            findNavController().navigate(R.id.action_editContactFragment_to_pageContainerFragment)
             viewModel.endNavigateToContactsFragment()
         }
     }

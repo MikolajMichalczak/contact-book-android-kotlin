@@ -3,36 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/contactsFragment">
+    app:startDestination="@id/pageContainerFragment">
     <fragment
         android:id="@+id/contactsFragment"
         android:name="com.example.contactbook.screens.contacts.ContactsFragment"
-        android:label="ContactsFragment" >
-        <action
-            android:id="@+id/action_contactsFragment_to_editContactFragment"
-            app:destination="@id/editContactFragment" />
-        <action
-            android:id="@+id/action_contactsFragment_to_extrasFragment"
-            app:destination="@id/extrasFragment" />
-    </fragment>
+        android:label="ContactsFragment" />
     <fragment
         android:id="@+id/editContactFragment"
         android:name="com.example.contactbook.screens.contacts.EditContactFragment"
         android:label="EditContactFragment" >
         <action
-            android:id="@+id/action_editContactFragment_to_contactsFragment"
-            app:destination="@id/contactsFragment"
-            app:popUpTo="@id/editContactFragment"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_editContactFragment_to_pageContainerFragment"
+            app:destination="@id/pageContainerFragment" />
     </fragment>
     <fragment
         android:id="@+id/extrasFragment"
         android:name="com.example.contactbook.screens.contacts.ExtrasFragment"
         android:label="ExtrasFragment" >
         <action
-            android:id="@+id/action_extrasFragment_to_contactsFragment"
-            app:destination="@id/contactsFragment"
-            app:popUpTo="@id/extrasFragment"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_extrasFragment_to_pageContainerFragment2"
+            app:destination="@id/pageContainerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pageContainerFragment"
+        android:name="com.example.contactbook.PageContainerFragment"
+        android:label="PageContainerFragment" >
+        <action
+            android:id="@+id/action_pageContainerFragment_to_editContactFragment"
+            app:destination="@id/editContactFragment" />
+        <action
+            android:id="@+id/action_pageContainerFragment_to_extrasFragment2"
+            app:destination="@id/extrasFragment" />
     </fragment>
 </navigation>
