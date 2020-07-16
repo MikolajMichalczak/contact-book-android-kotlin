@@ -18,13 +18,14 @@
 
         <TextView
             android:id="@+id/contact_name"
+            android:textStyle="bold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:padding="5dp"
             android:text="Name"
-            android:textSize="20sp"
+            android:textSize="19sp"
             app:layout_constraintEnd_toStartOf="@+id/favourite_image"
             app:layout_constraintStart_toEndOf="@+id/contact_image_view"
             app:layout_constraintTop_toTopOf="parent" />
@@ -32,10 +33,11 @@
         <TextView
             android:id="@+id/contact_number"
             android:layout_width="0dp"
+            android:textStyle="bold"
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:text="Number"
-            android:textSize="20sp"
+            android:textSize="19sp"
             app:layout_constraintEnd_toEndOf="@+id/contact_name"
             app:layout_constraintStart_toStartOf="@+id/contact_name"
             app:layout_constraintTop_toBottomOf="@+id/contact_name" />
@@ -45,7 +47,6 @@
             android:id="@+id/contacts_second_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/secondRecycler"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

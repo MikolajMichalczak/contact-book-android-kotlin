@@ -73,6 +73,5 @@ class ContactsExtrasAdapter(val listener: (ContactExtras) -> Unit)
                 listener(it)
             }
         }
-
     }
 }
