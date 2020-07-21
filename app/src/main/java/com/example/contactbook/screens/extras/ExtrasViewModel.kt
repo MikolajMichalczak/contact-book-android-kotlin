@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.contactbook.database.ContactsRepository
 import com.example.contactbook.database.ContactsRoomDatabase
 import com.example.contactbook.database.entities.ContactExtras
+import com.example.contactbook.network.RepoApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -29,7 +30,9 @@ class ExtrasViewModel (application: Application, _contactExtras: ContactExtras) 
     init {
         val contactsDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsDao()
         val contactsExtrasDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsExtrasDao()
-        repository = ContactsRepository(contactsDao, contactsExtrasDao)
+        val repositoriesDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).repositoriesDao()
+        val service = RepoApi.retrofitService
+        repository = ContactsRepository(contactsDao, contactsExtrasDao, repositoriesDao, service)
         if(contactExtras.address.isNotEmpty()) {
             addressText = contactExtras.address
             emailText = contactExtras.email

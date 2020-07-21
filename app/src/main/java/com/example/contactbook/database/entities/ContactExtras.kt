@@ -1,6 +1,7 @@
 package com.example.contactbook.database.entities
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
@@ -13,4 +14,4 @@ import kotlinx.android.parcel.Parcelize
     childColumns = arrayOf("contactOwnerId"),
     onDelete = CASCADE)]
 )
-data class ContactExtras(@PrimaryKey(autoGenerate = true) val id: Int, var email: String, var address: String, var contactOwnerId: Int) : Parcelable
+data class ContactExtras(@PrimaryKey(autoGenerate = true) val id: Int, var email: String, var address: String, @ColumnInfo(index = true) var contactOwnerId: Int) : Parcelable

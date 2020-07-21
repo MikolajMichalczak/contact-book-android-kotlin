@@ -8,16 +8,20 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.contactbook.database.daos.ContactsDao
 import com.example.contactbook.database.daos.ContactsExtrasDao
+import com.example.contactbook.database.daos.RepositoriesDao
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
+import com.example.contactbook.database.entities.Repository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
-@Database(entities = [Contact::class, ContactExtras::class], version = 2, exportSchema = false)
+@Database(entities = [Contact::class, ContactExtras::class, Repository::class], version = 1, exportSchema = false)
 public abstract class ContactsRoomDatabase : RoomDatabase() {
 
     abstract fun contactsDao(): ContactsDao
     abstract fun contactsExtrasDao(): ContactsExtrasDao
+    abstract  fun repositoriesDao(): RepositoriesDao
 
 //    private class ContactsDatabaseCallback(
 //        private val scope: CoroutineScope
@@ -27,14 +31,18 @@ public abstract class ContactsRoomDatabase : RoomDatabase() {
 //            super.onOpen(db)
 //            INSTANCE?.let { database ->
 //                scope.launch {
-//                    var contactsExtrasDao = database.contactsExtrasDao()
+//                    var reposDao = database.repositoriesDao()
 //
 //                    // Delete all content here.
-//                    contactsExtrasDao.deleteAllExtras()
+//                    reposDao.deleteAllRepos()
 //
 //                    // Add sample words.
-//                    var contactExtras = ContactExtras(0, "mm@wp.pl", "Lea 21/2")
-//                    contactsExtrasDao.insertExtras(contactExtras)
+//                    var repo = Repository("42", " fgregh", "erry", "ert")
+//                    var repo2 = Repository("43", " fgregh", "erry", "ert")
+//                    var repo3 = Repository("44", " fgregh", "erry", "ert")
+//                    reposDao.insertRepo(repo)
+//                    reposDao.insertRepo(repo2)
+//                    reposDao.insertRepo(repo3)
 //                }
 //            }
 //        }
@@ -71,6 +79,6 @@ public abstract class ContactsRoomDatabase : RoomDatabase() {
                 instance
             }
         }
-        }
     }
+}
 
