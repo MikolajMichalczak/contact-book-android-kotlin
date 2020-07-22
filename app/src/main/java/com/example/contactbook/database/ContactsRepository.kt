@@ -3,6 +3,7 @@ package com.example.contactbook.database
 import android.provider.ContactsContract
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
+import com.example.contactbook.data.ReposDataSource
 import com.example.contactbook.database.daos.ContactsDao
 import com.example.contactbook.database.daos.ContactsExtrasDao
 import com.example.contactbook.database.daos.RepositoriesDao
@@ -63,7 +64,7 @@ class ContactsRepository (private val contactsDao: ContactsDao, private val cont
         return service.fetchRepos(page, perPage)
     }
 
-    fun getPagedRepos(): DataSource.Factory<Int, Repository>{
+    fun getPagedRepos(): DataSource.Factory<Int, Repository> {
         return repositoriesDao.getPagedRepos()
     }
 

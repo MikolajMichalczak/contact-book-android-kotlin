@@ -29,15 +29,20 @@ class RepoBoundaryCallback (val repository: ContactsRepository, application: App
     private val sharedPref: SharedPreferences = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     override fun onZeroItemsLoaded() {
-        Log.i("RepoBoundaryCallback", "onzeroitemstriggered")
+        val currentPage = 1
+        savePage("current_page", currentPage)
+        Log.i("RepoBoundaryCallback", "zeroItemsPage:" + currentPage)
         super.onZeroItemsLoaded()
-        fetchUsers(1)
+        fetchUsers(currentPage)
     }
 
     override fun onItemAtEndLoaded(itemAtEnd: Repository) {
-        Log.i("RepoBoundaryCallback", "onitematendriggered")
+        val currentPage = getCurrentPage("current_page")
+        val nextPage = currentPage + 1
+        Log.i("RepoBoundaryCallback", "itemEndPage:" + currentPage)
         super.onItemAtEndLoaded(itemAtEnd)
-        fetchUsers(getCurrentPage("current_page"))
+        fetchUsers(nextPage)
+        savePage("current_page", nextPage)
     }
 
     private fun fetchUsers(page: Int) {
@@ -58,5 +63,12 @@ class RepoBoundaryCallback (val repository: ContactsRepository, application: App
 
     private fun getCurrentPage(KEY_NAME: String): Int{
         return sharedPref.getInt(KEY_NAME, 0)
+    }
+
+    private fun savePage(KEY_NAME: String, value: Int){
+        Log.i("RepoBoundaryCallback", value.toString())
+        val editor: SharedPreferences.Editor = sharedPref.edit()
+        editor.putInt(KEY_NAME, value)
+        editor.commit()
     }
 }

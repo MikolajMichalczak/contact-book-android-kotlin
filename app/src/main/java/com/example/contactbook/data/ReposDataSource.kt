@@ -13,7 +13,6 @@ import kotlinx.coroutines.*
 class ReposDataSource(private val contactsRepository: ContactsRepository,
                             private val scope: CoroutineScope, application: Application): PageKeyedDataSource<Int, Repository>() {
 
-
     private var supervisorJob = SupervisorJob()
 
     private val PREFS_NAME = "Paging"
