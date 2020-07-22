@@ -24,6 +24,7 @@ class ReposDataSource(private val contactsRepository: ContactsRepository,
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, Repository>
     ) {
+        Log.i("RepoBoundaryCallback", "initialTriggered")
         val currentPage = 1
         val nextPage = currentPage + 1
 
@@ -68,6 +69,7 @@ class ReposDataSource(private val contactsRepository: ContactsRepository,
     }
 
     private fun savePage(KEY_NAME: String, value: Int){
+        Log.i("RepoBoundaryCallback", value.toString())
         val editor: SharedPreferences.Editor = sharedPref.edit()
         editor.putInt(KEY_NAME, value)
         editor.commit()

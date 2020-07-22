@@ -13,16 +13,15 @@ import kotlinx.android.synthetic.main.repository_list_item.view.*
 
 class RepositoryAdapter() : PagedListAdapter<Repository, RepositoryAdapter.RepositoryViewHolder>(DIFF_CALLBACK) {
 
-    private var list: List<Repository> = emptyList()
+    //private var list: List<Repository> = emptyList()
 
     companion object {
         private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Repository>() {
             override fun areItemsTheSame(oldItem: Repository, newItem: Repository) =
                 oldItem.id == newItem.id
 
-            override fun areContentsTheSame(
-                oldItem: Repository, newItem: Repository
-            ) = oldItem == newItem
+            override fun areContentsTheSame(oldItem: Repository, newItem: Repository) =
+                oldItem == newItem
         }
     }
 
@@ -33,18 +32,18 @@ class RepositoryAdapter() : PagedListAdapter<Repository, RepositoryAdapter.Repos
     }
 
     override fun onBindViewHolder(holder: RepositoryViewHolder, position: Int) {
-        val repository: Repository? = list[position]
+        val repository: Repository? = getItem(position)
         holder.bind(repository)
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
+//    override fun getItemCount(): Int {
+//        return super.getItemCount()
+//    }
 
-    fun setList(repositoryList:List<Repository>){
-        list = repositoryList
-        notifyDataSetChanged()
-    }
+//    fun setList(repositoryList:List<Repository>){
+//        list = repositoryList
+//        notifyDataSetChanged()
+//    }
 
     inner class RepositoryViewHolder(private val binding: RepositoryListItemBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener {

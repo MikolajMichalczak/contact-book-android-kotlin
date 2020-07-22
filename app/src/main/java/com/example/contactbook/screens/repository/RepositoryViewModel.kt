@@ -1,6 +1,7 @@
 package com.example.contactbook.screens.repository
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -19,7 +20,11 @@ class RepositoryViewModel (application: Application) : AndroidViewModel(applicat
         private const val TAG = "RepositoryViewModel"
     }
 
-    var reposList: LiveData<PagedList<Repository>>
+    //var reposList: LiveData<PagedList<Repository>>
+
+    private var repoBoundaryCallback: RepoBoundaryCallback? = null
+
+    var reposList: LiveData<PagedList<Repository>>? = null
 
     private val repository: ContactsRepository
 
@@ -34,22 +39,27 @@ class RepositoryViewModel (application: Application) : AndroidViewModel(applicat
         val repositoriesDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).repositoriesDao()
         val service = RepoApi.retrofitService
         repository = ContactsRepository(contactsDao, contactsExtrasDao, repositoriesDao, service)
-
-        val config = PagedList.Config.Builder()
-            .setPageSize(15)
-            .setEnablePlaceholders(false)
-            .build()
-
-        reposList = initializedPagedListBuilder(config).setBoundaryCallback(RepoBoundaryCallback(repository, application)).build()
+        initializedPagedListBuilder(application)
     }
 
-    private fun initializedPagedListBuilder(config: PagedList.Config):
-            LivePagedListBuilder<Int, Repository> {
 
-        return LivePagedListBuilder(
+    private fun initializedPagedListBuilder(application: Application) {
+        repoBoundaryCallback = RepoBoundaryCallback(
+            repository, application
+        )
+
+        val pagedListConfig = PagedList.Config.Builder()
+            //.setPrefetchDistance(5)
+            //.setInitialLoadSizeHint(20)
+            .setEnablePlaceholders(true)
+            .setPageSize(15).build()
+
+        reposList = LivePagedListBuilder(
             repository.getPagedRepos(),
-            config)
+            pagedListConfig
+        ).setBoundaryCallback(repoBoundaryCallback).build()
     }
+
 
     override fun onCleared() {
         super.onCleared()

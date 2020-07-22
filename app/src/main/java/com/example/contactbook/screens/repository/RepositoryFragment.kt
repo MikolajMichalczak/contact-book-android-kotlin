@@ -1,6 +1,7 @@
 package com.example.contactbook.screens.repository
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.contactbook.R
+import com.example.contactbook.data.RepoBoundaryCallback
 import com.example.contactbook.databinding.FragmentRepositoryBinding
 
 
@@ -42,11 +44,11 @@ class RepositoryFragment: Fragment() {
             adapter = _adapter
         }
 
-        viewModel.reposList.observe(viewLifecycleOwner, Observer { reposList->
-            _adapter.setList(reposList)
+        viewModel.reposList?.observe(viewLifecycleOwner, Observer { reposList->
+            _adapter.submitList(reposList)
+            //_adapter.setList(reposList)
+            Log.i("RepoBoundaryCallback", reposList.size.toString())
         })
-
-
         return binding.root
     }
 }
