@@ -17,7 +17,6 @@ class ContactsRepository (private val contactsDao: ContactsDao, private val cont
 
     val allContacts: LiveData<List<Contact>> = contactsDao.getNames()
     val allContactsExtras: LiveData<List<ContactExtras>> = contactsExtrasDao.getExtras()
-    val allRepositories: LiveData<List<Repository>> = repositoriesDao.getAllRepos()
     val allAlphabetizedContacts: LiveData<List<Contact>> = contactsDao.getAlphabetizedNames()
     val allFavouriteContats: LiveData<List<Contact>> = contactsDao.getFavouriteContacts()
 
@@ -60,16 +59,17 @@ class ContactsRepository (private val contactsDao: ContactsDao, private val cont
 
     //Repositories
 
-    suspend fun fetchPagedRepos(page: Int, perPage: Int): List<Repository>{
-        return service.fetchRepos(page, perPage)
+    suspend fun fetchPagedRepos(name: String, page: Int, perPage: Int): List<Repository>{
+        return service.fetchSearchedRepos(name, page, perPage)
+    }
+
+
+    fun getSearchedRepos(name: String): DataSource.Factory<Int, Repository> {
+        return repositoriesDao.getSearchedRepos(name)
     }
 
     fun getPagedRepos(): DataSource.Factory<Int, Repository> {
         return repositoriesDao.getPagedRepos()
-    }
-
-    fun getAllRepos(){
-        repositoriesDao.getAllRepos()
     }
 
     suspend fun insertRepo(repository: Repository) {

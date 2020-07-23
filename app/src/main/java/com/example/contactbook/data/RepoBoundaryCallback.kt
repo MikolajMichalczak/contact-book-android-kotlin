@@ -18,6 +18,7 @@ import java.util.concurrent.Executors
 class RepoBoundaryCallback (val repository: ContactsRepository, application: Application) :
     PagedList.BoundaryCallback<Repository?>() {
 
+    var filterText = ""
 
     private var callbackJob = Job()
 
@@ -29,27 +30,37 @@ class RepoBoundaryCallback (val repository: ContactsRepository, application: App
     private val sharedPref: SharedPreferences = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     override fun onZeroItemsLoaded() {
+        val reposType = getReposType("all_repos")
         val currentPage = 1
         savePage("current_page", currentPage)
         Log.i("RepoBoundaryCallback", "zeroItemsPage:" + currentPage)
         super.onZeroItemsLoaded()
-        fetchUsers(currentPage)
+        fetchUsers(currentPage, reposType)
     }
 
     override fun onItemAtEndLoaded(itemAtEnd: Repository) {
+        val reposType = getReposType("all_repos")
         val currentPage = getCurrentPage("current_page")
         val nextPage = currentPage + 1
         Log.i("RepoBoundaryCallback", "itemEndPage:" + currentPage)
         super.onItemAtEndLoaded(itemAtEnd)
-        fetchUsers(nextPage)
+        fetchUsers(nextPage, reposType)
         savePage("current_page", nextPage)
     }
 
-    private fun fetchUsers(page: Int) {
+    private fun fetchUsers(page: Int, reposType: Int) {
         coroutineScope.launch {
             try {
-                var newRepos = RepoApi.retrofitService.fetchRepos(page)
-                insertRepoToDb(newRepos)
+                when(reposType) {
+                    1 -> {
+                        var newRepos = RepoApi.retrofitService.fetchAllRepos(page)
+                        insertRepoToDb(newRepos)
+                    }
+                    else -> {
+                        var newRepos = RepoApi.retrofitService.fetchSearchedRepos(filterText, page)
+                        insertRepoToDb(newRepos)
+                    }
+                }
             }
             catch (e: Exception){
                 Log.i("RepoBoundaryCallback", e.toString())
@@ -62,6 +73,10 @@ class RepoBoundaryCallback (val repository: ContactsRepository, application: App
     }
 
     private fun getCurrentPage(KEY_NAME: String): Int{
+        return sharedPref.getInt(KEY_NAME, 0)
+    }
+
+    private fun getReposType(KEY_NAME: String): Int{
         return sharedPref.getInt(KEY_NAME, 0)
     }
 

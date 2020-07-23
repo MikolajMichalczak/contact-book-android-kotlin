@@ -57,7 +57,7 @@ class ReposDataSource(private val contactsRepository: ContactsRepository,
     private fun executeQuery(page: Int, perPage: Int, callback: (List<Repository>) -> Unit) {
         scope.launch(getJobErrorHandler() + supervisorJob) {
             savePage("current_page", page)
-            val repos = contactsRepository.fetchPagedRepos(page, perPage)
+            val repos = contactsRepository.fetchPagedRepos("", page, perPage)
             callback(repos)
         }
     }

@@ -1,12 +1,8 @@
 package com.example.contactbook.database.daos
 
-import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
-import com.example.contactbook.data.ReposDataSource
-import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.database.entities.Repository
-import java.time.Period
 
 @Dao
 interface  RepositoriesDao {
@@ -14,8 +10,8 @@ interface  RepositoriesDao {
     @Query("SELECT * from repositories_table ORDER BY name DESC")
     fun getPagedRepos(): DataSource.Factory<Int,Repository>
 
-    @Query("SELECT * from repositories_table ORDER BY name DESC")
-    fun getAllRepos(): LiveData<List<Repository>>
+    @Query("SELECT * FROM repositories_table where name LIKE :name ORDER BY name DESC")
+    fun getSearchedRepos(name: String): DataSource.Factory<Int, Repository>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRepo(repository: Repository)

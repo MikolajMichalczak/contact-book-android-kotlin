@@ -7,6 +7,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 private const val BASE_URL =
@@ -23,9 +24,14 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface RepoApiService {
-    @GET("/orgs/google/repos")
-    suspend fun fetchRepos(@Query("page") page: Int,
+    @GET("/repos/google/{name}")
+    suspend fun fetchSearchedRepos(@Path("name") name: String,
+                           @Query("page") page: Int,
                            @Query("per_page") perPage: Int = 15): List<Repository>
+
+    @GET("/orgs/google/repos")
+    suspend fun fetchAllRepos(@Query("page") page: Int,
+                              @Query("per_page") perPage: Int = 15): List<Repository>
 }
 
 object RepoApi {
