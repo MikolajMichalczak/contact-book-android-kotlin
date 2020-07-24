@@ -10,11 +10,14 @@ interface  RepositoriesDao {
     @Query("SELECT * from repositories_table ORDER BY name DESC")
     fun getPagedRepos(): DataSource.Factory<Int,Repository>
 
-    @Query("SELECT * FROM repositories_table where name LIKE :name ORDER BY name DESC")
+    @Query("SELECT * FROM repositories_table where name LIKE '%' || :name  || '%' ORDER BY name DESC")
     fun getSearchedRepos(name: String): DataSource.Factory<Int, Repository>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRepo(repository: Repository)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRepos(repository: Iterable<Repository>)
 
     @Query("DELETE FROM repositories_table")
     suspend fun deleteAllRepos()

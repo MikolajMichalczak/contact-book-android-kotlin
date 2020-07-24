@@ -57,7 +57,7 @@ class RepoBoundaryCallback (val repository: ContactsRepository, application: App
                         insertRepoToDb(newRepos)
                     }
                     else -> {
-                        var newRepos = RepoApi.retrofitService.fetchSearchedRepos(filterText, page)
+                        var newRepos = RepoApi.retrofitService.fetchSearchedRepos(filterText)
                         insertRepoToDb(newRepos)
                     }
                 }
@@ -69,7 +69,7 @@ class RepoBoundaryCallback (val repository: ContactsRepository, application: App
     }
 
      private suspend fun insertRepoToDb(reposList: List<Repository>){
-        reposList.forEach{repository.insertRepo(it)}
+        repository.insertRepos(reposList)
     }
 
     private fun getCurrentPage(KEY_NAME: String): Int{

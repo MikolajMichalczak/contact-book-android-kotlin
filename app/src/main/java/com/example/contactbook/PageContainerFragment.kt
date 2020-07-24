@@ -17,6 +17,7 @@ import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.databinding.FragmentEditContactBinding
 import com.example.contactbook.databinding.FragmentExtrasBinding
 import com.example.contactbook.databinding.FragmentPageContainerBinding
+import com.example.contactbook.screens.contacts.ContactsFragment
 import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
 import com.example.contactbook.screens.extras.ExtrasViewModel
@@ -52,8 +53,9 @@ class PageContainerFragment : Fragment() {
         val tabLayout = binding.tabsMain
         TabLayoutMediator(tabLayout, viewPager!!) { tab, position ->
             when (position) {
-                0 -> tab.text = "Contacts"
-                1 -> tab.text = "Repositories"
+                0 -> {tab.text = "Contacts"
+                binding}
+                1 -> {tab.text = "Repositories"}
             }
         }.attach()
 

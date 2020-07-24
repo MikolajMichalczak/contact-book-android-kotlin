@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isNotEmpty
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -15,12 +16,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.contactbook.MainActivity
 import com.example.contactbook.R
 import com.example.contactbook.SwipeToDeleteCallback
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.databinding.FragmentContactsBinding
-
 
 class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -45,9 +44,9 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_menu, menu)
-
         val searchItem = menu.findItem(R.id.action_search)
         val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.onActionViewCollapsed()
         searchView.setOnQueryTextListener(this)
         this.menu = menu
     }
@@ -209,6 +208,13 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
             )
             viewModel.endNavigateToEditContactFragment()
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.onActionViewCollapsed()
     }
 
 }

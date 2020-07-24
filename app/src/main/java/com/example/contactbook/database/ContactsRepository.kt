@@ -1,16 +1,13 @@
 package com.example.contactbook.database
 
-import android.provider.ContactsContract
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
-import com.example.contactbook.data.ReposDataSource
 import com.example.contactbook.database.daos.ContactsDao
 import com.example.contactbook.database.daos.ContactsExtrasDao
 import com.example.contactbook.database.daos.RepositoriesDao
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.database.entities.Repository
-import com.example.contactbook.network.RepoApi
 import com.example.contactbook.network.RepoApiService
 
 class ContactsRepository (private val contactsDao: ContactsDao, private val contactsExtrasDao: ContactsExtrasDao, private val repositoriesDao: RepositoriesDao, private val service: RepoApiService) {
@@ -60,7 +57,7 @@ class ContactsRepository (private val contactsDao: ContactsDao, private val cont
     //Repositories
 
     suspend fun fetchPagedRepos(name: String, page: Int, perPage: Int): List<Repository>{
-        return service.fetchSearchedRepos(name, page, perPage)
+        return service.fetchSearchedRepos(name)
     }
 
 
@@ -74,6 +71,10 @@ class ContactsRepository (private val contactsDao: ContactsDao, private val cont
 
     suspend fun insertRepo(repository: Repository) {
         repositoriesDao.insertRepo(repository)
+    }
+
+    suspend fun insertRepos(repositories: Iterable<Repository>) {
+        repositoriesDao.insertRepos(repositories)
     }
 
     suspend fun deleteAllRepos() {

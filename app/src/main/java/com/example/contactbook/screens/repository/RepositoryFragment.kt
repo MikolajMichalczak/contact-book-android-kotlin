@@ -6,14 +6,11 @@ import android.view.*
 import android.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.contactbook.R
-import com.example.contactbook.data.RepoBoundaryCallback
-import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.Repository
 import com.example.contactbook.databinding.FragmentRepositoryBinding
 
@@ -27,7 +24,6 @@ class RepositoryFragment: Fragment(), SearchView.OnQueryTextListener  {
     private lateinit var _adapter: RepositoryAdapter
     private lateinit var viewModel: RepositoryViewModel
     private lateinit var binding: FragmentRepositoryBinding
-    private lateinit var reposListForSearch: PagedList<Repository>
     private lateinit var menu: Menu
 
 
@@ -38,7 +34,6 @@ class RepositoryFragment: Fragment(), SearchView.OnQueryTextListener  {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.repos_menu, menu)
-
         val searchItem = menu.findItem(R.id.action_search)
         val searchView: SearchView = searchItem.actionView as SearchView
         searchView.setOnQueryTextListener(this)
@@ -54,18 +49,6 @@ class RepositoryFragment: Fragment(), SearchView.OnQueryTextListener  {
         binding.reposList.scrollToPosition(0)
         return true
     }
-
-//    private fun filter(reposListForSearch: PagedList<Repository>, query: String?): PagedList<Repository>{
-//        val  lowerCaseQuery = query?.toLowerCase();
-//        val filteredReposList: PagedList<Repository> = ArrayList()
-//        for (repo in reposListForSearch) {
-//            val text: String = repo.name.toLowerCase()
-//            if (text.contains(lowerCaseQuery.toString())) {
-//                filteredReposList.add(repo)
-//            }
-//        }
-//        return filteredReposList
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -92,5 +75,12 @@ class RepositoryFragment: Fragment(), SearchView.OnQueryTextListener  {
             Log.i("RepoBoundaryCallback", reposList.size.toString())
         })
         return binding.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.onActionViewCollapsed()
     }
 }
