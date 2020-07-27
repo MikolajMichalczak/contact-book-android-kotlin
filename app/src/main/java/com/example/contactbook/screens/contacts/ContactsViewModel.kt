@@ -21,10 +21,17 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
 
     private var allContacts: LiveData<List<Contact>>
     var allContactsExtras: LiveData<List<ContactExtras>>
-    private val allFavouriteContacts: LiveData<List<Contact>>
 
-    val contacts = MediatorLiveData<List<Contact>>()
-    private var currentType = "notFavourite"
+    var _shouldShowFavouritesOnly = MutableLiveData<Boolean>(false)
+    val shouldShowFavouritesOnly: LiveData<Boolean>
+        get() = _shouldShowFavouritesOnly
+
+    var _isSorted = MutableLiveData<Boolean>(false)
+    val isSorted: LiveData<Boolean>
+        get() = _isSorted
+
+    private val contactsMediator: MediatorLiveData<Any>
+    val contacts: LiveData<List<Contact>>
 
     private var _toEditContactFragment = MutableLiveData<Boolean>()
     val toEditContactFragment: LiveData<Boolean>
@@ -39,31 +46,24 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
         repository = ContactsRepository(contactsDao,contactsExtrasDao, repositoriesDao, service)
         allContacts = repository.allContacts
         allContactsExtras = repository.allContactsExtras
-        allFavouriteContacts = repository.allFavouriteContats
 
-        contacts.addSource(allContacts) { result ->
-            if (currentType == "notFavourite") {
-                result?.let { contacts.value = it }
-            }
+        contactsMediator = MediatorLiveData<Any>().apply {
+            addSource(allContacts) {value = it}
+            addSource(shouldShowFavouritesOnly) { value = it }
+            addSource(isSorted) { value = it }
         }
-        contacts.addSource(allFavouriteContacts) { result ->
-            if (currentType == "favourite") {
-                result?.let { contacts.value = it }
-            }
+
+        contacts = Transformations.map(contactsMediator) {
+            val filteredContacts = (allContacts.value ?: emptyList())
+                .filter { if(shouldShowFavouritesOnly.value == true) it.favourite == 1 else true }
+
+            if(isSorted.value == true) filteredContacts.sortedBy { it.name }
+            else filteredContacts
         }
     }
-
-    fun setContactsType(type: String) = when (type) {
-        "favourite" -> allFavouriteContacts.value?.let { contacts.value = it }
-        else -> allContacts.value?.let { contacts.value = it }
-    }.also { currentType = type }
 
     fun removeContacts() = viewModelScope.launch(Dispatchers.IO) {
         repository.deleteAll()
-    }
-
-    fun sortContacts(){
-        allContacts = repository.allAlphabetizedContacts
     }
 
     fun deleteContact(contact: Contact) = viewModelScope.launch(Dispatchers.IO) {

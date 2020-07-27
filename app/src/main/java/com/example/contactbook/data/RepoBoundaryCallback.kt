@@ -57,8 +57,8 @@ class RepoBoundaryCallback (val repository: ContactsRepository, application: App
                         insertRepoToDb(newRepos)
                     }
                     else -> {
-                        var newRepos = RepoApi.retrofitService.fetchSearchedRepos(filterText)
-                        insertRepoToDb(newRepos)
+//                        var newRepos = RepoApi.retrofitService.fetchSearchedRepos(filterText)
+//                        insertRepoToDb(newRepos)
                     }
                 }
             }

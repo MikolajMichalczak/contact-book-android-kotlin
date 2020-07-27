@@ -8,49 +8,55 @@
             type="com.example.contactbook.screens.editcontact.EditContactViewModel" />
     </data>
 
+    <ScrollView
+        android:fillViewport="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".screens.editcontact.EditContactFragment">
 
-    <EditText
-        android:id="@+id/editTextName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="Name"
-        android:text="@={viewModel.nameText}"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/editTextNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="@={viewModel.numberText}"
-        android:hint="Number"
-        app:layout_constraintBottom_toTopOf="@+id/editTextName"
-        app:layout_constraintEnd_toEndOf="@+id/editTextName"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/editTextName" />
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="Name"
+            android:text="@={viewModel.nameText}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/addContact"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/update_contact"
-        app:layout_constraintEnd_toEndOf="@+id/editTextName"
-        app:layout_constraintStart_toStartOf="@+id/editTextName"
-        app:layout_constraintTop_toBottomOf="@+id/editTextName"
-        android:onClickListener="@{() -> viewModel.updateContact()}"/>
+        <EditText
+            android:id="@+id/editTextNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="28dp"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            android:text="@={viewModel.numberText}"
+            android:hint="Number"
+            app:layout_constraintBottom_toTopOf="@+id/editTextName"
+            app:layout_constraintEnd_toEndOf="@+id/editTextName"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/editTextName" />
+
+        <Button
+            android:id="@+id/addContact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/update_contact"
+            app:layout_constraintEnd_toEndOf="@+id/editTextName"
+            app:layout_constraintStart_toStartOf="@+id/editTextName"
+            app:layout_constraintTop_toBottomOf="@+id/editTextName"
+            android:onClickListener="@{() -> viewModel.updateContact()}"/>
 
         <ImageView
             android:id="@+id/contact_image_view"
@@ -64,5 +70,8 @@
             app:layout_constraintStart_toStartOf="@+id/editTextNumber"
             app:srcCompat="@drawable/person_icon_24" />
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 </layout>

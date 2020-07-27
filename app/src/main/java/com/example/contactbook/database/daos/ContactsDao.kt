@@ -8,9 +8,6 @@ import com.example.contactbook.database.entities.Contact
 @Dao
 interface  ContactsDao {
 
-    @Query("SELECT * from contacts_table ORDER BY name ASC")
-    fun getAlphabetizedNames(): LiveData<List<Contact>>
-
     @Query("SELECT * from contacts_table")
     fun getNames(): LiveData<List<Contact>>
 

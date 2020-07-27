@@ -83,7 +83,7 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
             Toast.makeText(activity, "removed", Toast.LENGTH_SHORT).show()
         }
         if (id == R.id.action_sort){
-            viewModel.sortContacts()
+            viewModel._isSorted.value = true
             Toast.makeText(activity, "Sorted", Toast.LENGTH_SHORT).show()
         }
 
@@ -186,14 +186,12 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         }
 
     private fun changeStar(){
-        if(contactsType=="notFavourite") {
-            contactsType = "favourite"
-            viewModel.setContactsType(contactsType)
+        if(viewModel.shouldShowFavouritesOnly.value == false) {
+            viewModel._shouldShowFavouritesOnly.value = true
             menu.getItem(2).setIcon(ContextCompat.getDrawable(context!!, R.drawable.star_icon_yellow_24));
         }
         else{
-            contactsType = "notFavourite"
-            viewModel.setContactsType(contactsType)
+            viewModel._shouldShowFavouritesOnly.value = false
             menu.getItem(2).setIcon(ContextCompat.getDrawable(context!!, R.drawable.star_icon_white_24));
         }
     }

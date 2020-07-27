@@ -36,15 +36,6 @@ class RepositoryAdapter() : PagedListAdapter<Repository, RepositoryAdapter.Repos
         holder.bind(repository)
     }
 
-//    override fun getItemCount(): Int {
-//        return super.getItemCount()
-//    }
-
-//    fun setList(repositoryList:List<Repository>){
-//        list = repositoryList
-//        notifyDataSetChanged()
-//    }
-
     inner class RepositoryViewHolder(private val binding: RepositoryListItemBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener {
         private var nameView: TextView? = null
