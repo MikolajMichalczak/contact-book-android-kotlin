@@ -60,6 +60,8 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
             if(isSorted.value == true) filteredContacts.sortedBy { it.name }
             else filteredContacts
         }
+
+
     }
 
     fun removeContacts() = viewModelScope.launch(Dispatchers.IO) {

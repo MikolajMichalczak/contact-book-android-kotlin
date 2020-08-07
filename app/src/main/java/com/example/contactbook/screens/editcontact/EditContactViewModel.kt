@@ -1,6 +1,8 @@
 package com.example.contactbook.screens.editcontact
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -12,6 +14,7 @@ import com.example.contactbook.database.ContactsRepository
 import com.example.contactbook.database.ContactsRoomDatabase
 import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.network.RepoApi
+import com.example.contactbook.screens.repository.RepositoryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -20,7 +23,14 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
 
     companion object{
         private const val TAG = "EditContactViewModel"
+        private const val PREFS_NAME = "CallReminders"
+        private const val DAY = "Day"
+        private const val MONTH = "Month"
+        private const val YEAR = "Year"
+
     }
+
+    private val sharedPref: SharedPreferences = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private val repository: ContactsRepository
     var contact = _contact
@@ -34,6 +44,11 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
     var _imageUri = MutableLiveData<String>()
     val imageUri: LiveData<String>
         get() = _imageUri
+
+    var _callReminderData = MutableLiveData<List<Int>>()
+    val callReminderData: LiveData<List<Int>>
+        get() = _callReminderData
+
 
     init {
         val contactsDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsDao()
@@ -49,6 +64,9 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
         else{
             _imageUri.value = ""
         }
+
+        initSharedPref()
+
     }
 
     fun updateContact(){
@@ -98,6 +116,11 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
 
     fun endNavigateToContactsFragment(){
         _toContactsFragment.value = false
+    }
+
+    fun initSharedPref(){
+        val reminderDataList = listOf(sharedPref.getInt(DAY, 0), sharedPref.getInt(MONTH, 0), sharedPref.getInt(YEAR, 0))
+        _callReminderData.value = reminderDataList
     }
 
 }

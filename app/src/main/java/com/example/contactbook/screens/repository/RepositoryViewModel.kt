@@ -23,8 +23,7 @@ class RepositoryViewModel (application: Application) : AndroidViewModel(applicat
         private const val PREFS_NAME = "Paging"
     }
 
-    private val sharedPref: SharedPreferences =
-        application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val sharedPref: SharedPreferences = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     var filterText = MutableLiveData<String>("")
 

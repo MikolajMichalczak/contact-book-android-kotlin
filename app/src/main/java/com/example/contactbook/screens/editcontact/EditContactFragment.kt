@@ -3,7 +3,9 @@ package com.example.contactbook.screens.contacts
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -25,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.contactbook.R
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.databinding.FragmentEditContactBinding
+import com.example.contactbook.dialogs.DateAndTimeDialogFragment
 import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
 import com.squareup.picasso.Picasso
@@ -40,12 +43,17 @@ class EditContactFragment : Fragment() {
         private const val STORAGEREQUEST_RESULT = 1
         private const val CAMERAREQUEST_RESULT = 0
         private const val CAMERA_REQUEST_CODE = 101
+        private const val PREFS_NAME = "CallReminders"
+        private const val DAY = "Day"
+        private const val MONTH = "Month"
+        private const val YEAR = "Year"
     }
 
     private lateinit var viewModel: EditContactViewModel
     private lateinit var binding: FragmentEditContactBinding
     private lateinit var viewModelFactory: EditContactViewModelFactory
     private lateinit var contact: Contact
+    private val sharedPref: SharedPreferences = context!!.applicationContext!!.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 
     override fun onCreateView(
@@ -64,6 +72,9 @@ class EditContactFragment : Fragment() {
                 requireActivity().application,
                 contact
             )
+
+        if(contact.name.isNotEmpty())
+            binding.reminderLinearLayout.visibility = View.VISIBLE
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(EditContactViewModel::class.java)
         binding.viewModel = viewModel
@@ -84,6 +95,12 @@ class EditContactFragment : Fragment() {
                 Picasso.get().load(uri).placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24).into(binding.contactImageView)
         })
 
+        viewModel.callReminderData.observe((viewLifecycleOwner, Observer { data ->
+            if(data == null || data.first() == 0){
+                //TODO...
+            }
+        })
+
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Where to choose a photo?")
         builder.setPositiveButton("Camera") { dialog, which ->
@@ -101,6 +118,11 @@ class EditContactFragment : Fragment() {
 
         binding.contactImageView.setOnClickListener(){
             builder.show()
+        }
+
+        binding.callReminderBtn.setOnClickListener {
+            val dialogFragment = DateAndTimeDialogFragment(0,0,0) { day, month, year ->  saveReminderToPrefs(day, month, year) }
+            dialogFragment.show(activity!!.supportFragmentManager, DateAndTimeDialogFragment.TAG)
         }
 
         return binding.root
@@ -200,6 +222,14 @@ class EditContactFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun saveReminderToPrefs(day: Int, month: Int, year: Int){
+        val editor: SharedPreferences.Editor = sharedPref.edit()
+        editor.putInt(DAY, day)
+        editor.putInt(MONTH, month)
+        editor.putInt(YEAR, year)
+        editor.commit()
     }
 
     private fun navigateToContactsFragment(_state: Boolean) {

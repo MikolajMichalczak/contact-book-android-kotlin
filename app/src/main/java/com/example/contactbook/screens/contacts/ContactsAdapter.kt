@@ -102,8 +102,8 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
             secondList = binding.contactsSecondList
             chooseExtras(contact)
 
-            var _adapter = ContactsExtrasAdapter{contactExtras: ContactExtras ->
-                listenerExtras(contactExtras)
+            var _adapter = ContactsExtrasAdapter{
+                listenerExtras(it)
             }
 
             secondList.apply{

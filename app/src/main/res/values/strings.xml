@@ -10,4 +10,8 @@
     <string name="search_title">Search</string>
     <string name="search_hint">Name</string>
     <string name="button_edit_contact">Edit</string>
+    <string name="set_reminder">Set a call reminder</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="submit">Submit</string>
 </resources>

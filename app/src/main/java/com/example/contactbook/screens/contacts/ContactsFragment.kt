@@ -112,22 +112,22 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         val builder = AlertDialog.Builder(requireContext())
 
         _adapter = ContactsAdapter(
-            listenerExtras = {contactExtras->
-            Log.i(TAG, contactExtras.toString())
-            bundle.putParcelable("contactExtras", contactExtras)
+            listenerExtras = {
+            Log.i(TAG, it.toString())
+            bundle.putParcelable("contactExtras", it)
             findNavController().navigate(R.id.action_pageContainerFragment_to_extrasFragment2, bundle) },
 
-            listener = {contact ->
-                bundle.putParcelable("contact", contact)
+            listener = {
+                bundle.putParcelable("contact", it)
                 findNavController().navigate(R.id.action_pageContainerFragment_to_editContactFragment, bundle) },
 
-            longListener = {contact ->
-                if(contact.favourite == 0) {
+            longListener = {
+                if(it.favourite == 0) {
                     builder.setTitle("Do you want to make contact favourite?")
                     builder.setPositiveButton("Yes") { dialog, which ->
-                        contact.favourite = 1
-                        viewModel.update(contact)
-                        Log.i(TAG, contact.toString())
+                        it.favourite = 1
+                        viewModel.update(it)
+                        Log.i(TAG, it.toString())
                     }
 
                     builder.setNegativeButton("Cancel") { dialog, which ->
@@ -137,9 +137,9 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
                 else{
                     builder.setTitle("Do you want to make contact not favourite?")
                     builder.setPositiveButton("Yes") { dialog, which ->
-                        contact.favourite = 0
-                        viewModel.update(contact)
-                        Log.i(TAG, contact.toString())
+                        it.favourite = 0
+                        viewModel.update(it)
+                        Log.i(TAG, it.toString())
                     }
 
                     builder.setNegativeButton("Cancel") { dialog, which ->
