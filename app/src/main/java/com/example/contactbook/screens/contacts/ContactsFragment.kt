@@ -25,6 +25,7 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
 
     companion object{
         private const val TAG = "ContactsFragment"
+        private val CONTACT_ID = "contact_id"
     }
 
     private lateinit var viewModel: ContactsViewModel
@@ -208,12 +209,12 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView: SearchView = searchItem.actionView as SearchView
-        searchView.onActionViewCollapsed()
-    }
+//    override fun onPause() {
+////        super.onPause()
+////        val searchItem = menu.findItem(R.id.action_search)
+////        val searchView: SearchView = searchItem.actionView as SearchView
+////        searchView.onActionViewCollapsed()
+//    }
 
 }
 

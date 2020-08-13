@@ -7,6 +7,7 @@ import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.ContactsRepository
 import com.example.contactbook.database.ContactsRoomDatabase
 import com.example.contactbook.database.entities.ContactExtras
+import com.example.contactbook.database.entities.Repository
 import com.example.contactbook.network.RepoApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,11 +40,9 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
 
     init{
         _toEditContactFragment.value = false
-        val contactsDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsDao()
-        val contactsExtrasDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsExtrasDao()
-        val repositoriesDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).repositoriesDao()
+        val database = ContactsRoomDatabase.getDatabase(application, viewModelScope)
         val service = RepoApi.retrofitService
-        repository = ContactsRepository(contactsDao,contactsExtrasDao, repositoriesDao, service)
+        repository = ContactsRepository(database ,service)
         allContacts = repository.allContacts
         allContactsExtras = repository.allContactsExtras
 
@@ -82,6 +81,10 @@ class ContactsViewModel (application: Application) : AndroidViewModel(applicatio
 
     fun update(contact: Contact)= viewModelScope.launch(Dispatchers.IO) {
         repository.updateContact(contact)
+    }
+
+    fun getAndDeleteContactFromNotif(contactId: Int) = viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteReminderByContactId(contactId)
     }
 
     override fun onCleared() {

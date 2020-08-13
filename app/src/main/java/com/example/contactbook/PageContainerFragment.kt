@@ -1,6 +1,7 @@
 package com.example.contactbook
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import com.example.contactbook.databinding.FragmentEditContactBinding
 import com.example.contactbook.databinding.FragmentExtrasBinding
 import com.example.contactbook.databinding.FragmentPageContainerBinding
 import com.example.contactbook.screens.contacts.ContactsFragment
+import com.example.contactbook.screens.contacts.ContactsViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
 import com.example.contactbook.screens.extras.ExtrasViewModel
@@ -31,11 +33,20 @@ class PageContainerFragment : Fragment() {
 
     companion object{
         private const val TAG = "PageContainerFragment"
+        private val CONTACT_ID = "contact_id"
     }
 
     private var viewPager: ViewPager2? = null
 
+    private lateinit var viewModel: ContactsViewModel
     private lateinit var binding: FragmentPageContainerBinding
+    private lateinit var bundle: Bundle
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setHasOptionsMenu(true)
+            bundle = Bundle()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,6 +54,17 @@ class PageContainerFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_page_container, container, false)
+
+        viewModel = ViewModelProvider(this).get(ContactsViewModel::class.java)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+
+        var contactIdFromNotif = arguments?.getInt(CONTACT_ID)
+
+        if(contactIdFromNotif != null){
+            viewModel.getAndDeleteContactFromNotif(contactIdFromNotif)
+        }
+
 
         binding.lifecycleOwner = this
 

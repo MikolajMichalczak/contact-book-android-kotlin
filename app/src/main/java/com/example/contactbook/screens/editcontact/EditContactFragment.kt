@@ -1,12 +1,12 @@
 package com.example.contactbook.screens.contacts
 
 import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +16,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -24,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.work.WorkInfo
 import com.example.contactbook.R
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.databinding.FragmentEditContactBinding
@@ -33,6 +36,7 @@ import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
 import com.squareup.picasso.Picasso
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -43,19 +47,15 @@ class EditContactFragment : Fragment() {
         private const val STORAGEREQUEST_RESULT = 1
         private const val CAMERAREQUEST_RESULT = 0
         private const val CAMERA_REQUEST_CODE = 101
-        private const val PREFS_NAME = "CallReminders"
-        private const val DAY = "Day"
-        private const val MONTH = "Month"
-        private const val YEAR = "Year"
     }
 
     private lateinit var viewModel: EditContactViewModel
     private lateinit var binding: FragmentEditContactBinding
     private lateinit var viewModelFactory: EditContactViewModelFactory
     private lateinit var contact: Contact
-    private val sharedPref: SharedPreferences = context!!.applicationContext!!.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,19 +73,44 @@ class EditContactFragment : Fragment() {
                 contact
             )
 
-        if(contact.name.isNotEmpty())
-            binding.reminderLinearLayout.visibility = View.VISIBLE
-
         viewModel = ViewModelProvider(this, viewModelFactory).get(EditContactViewModel::class.java)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
+        if(contact.name.isNotEmpty())
+            binding.reminderLinearLayout.visibility = View.VISIBLE
+
+
         binding.editTextName.setText(contact?.name)
         binding.editTextNumber.setText((contact?.number))
+
+//        viewModel.outputWorkInfos.observe(viewLifecycleOwner, Observer {workStatusList ->
+////            val currentWorkStatus = workStatusList?.getOrNull(0)
+////            if (currentWorkStatus?.state?.isFinished == true) {
+////                //viewModel.deleteReminder()
+////            }
+////            else{
+////                //showProcessFunction
+////            }
+//        })
+        viewModel.workManager.getWorkInfosByTagLiveData(contact.contactId.toString())
+            .observe(viewLifecycleOwner, Observer { workInfo ->
+                // Check if the current work's state is "successfully finished"
+                if (workInfo == WorkInfo.State.SUCCEEDED) {
+                    Log.i(TAG, "Sukces")
+                }
+            })
 
 
         viewModel.toContactsFragment.observe(viewLifecycleOwner, Observer {state ->
             navigateToContactsFragment(state)
+        })
+
+        viewModel.invalidDate.observe(viewLifecycleOwner, Observer {state ->
+            if(state) {
+                Toast.makeText(activity, R.string.invalid_date, Toast.LENGTH_SHORT).show()
+                viewModel.changeInvalidDateVariableState()
+            }
         })
 
         viewModel.imageUri.observe(viewLifecycleOwner, Observer {uri ->
@@ -95,11 +120,27 @@ class EditContactFragment : Fragment() {
                 Picasso.get().load(uri).placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24).into(binding.contactImageView)
         })
 
-        viewModel.callReminderData.observe((viewLifecycleOwner, Observer { data ->
-            if(data == null || data.first() == 0){
-                //TODO...
+        viewModel.callReminderAndContactData.observe(viewLifecycleOwner, Observer { contactAndReminder ->
+            if(contactAndReminder == null) {
+                binding.callReminderTextView.text = resources.getString(R.string.set_reminder)
+                binding.callReminderBtn.visibility = View.VISIBLE
+                binding.deleteCallReminderBtn.visibility = View.GONE
+            }
+            else{
+                if(contactAndReminder.callReminder?.dayTime != null){
+                    Log.i(TAG, contactAndReminder.toString())
+                    binding.callReminderTextView.text = "Reminder set to \n${DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(contactAndReminder.callReminder?.dayTime)}"
+                    binding.callReminderBtn.visibility = View.GONE
+                    binding.deleteCallReminderBtn.visibility = View.VISIBLE
+                }
+                else{
+                    binding.callReminderTextView.text = resources.getString(R.string.set_reminder)
+                    binding.callReminderBtn.visibility = View.VISIBLE
+                    binding.deleteCallReminderBtn.visibility = View.GONE
+                }
             }
         })
+
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Where to choose a photo?")
@@ -121,9 +162,17 @@ class EditContactFragment : Fragment() {
         }
 
         binding.callReminderBtn.setOnClickListener {
-            val dialogFragment = DateAndTimeDialogFragment(0,0,0) { day, month, year ->  saveReminderToPrefs(day, month, year) }
+            val dialogFragment = DateAndTimeDialogFragment() { dateTime -> Log.i(
+                TAG, dateTime.toString())
+                viewModel.saveReminder(dateTime) }
             dialogFragment.show(activity!!.supportFragmentManager, DateAndTimeDialogFragment.TAG)
         }
+
+        binding.deleteCallReminderBtn.setOnClickListener {
+            viewModel.deleteReminder()
+        }
+
+        createChannel(getString(R.string.call_notification_channel_id), getString(R.string.call_notification_channel_name))
 
         return binding.root
     }
@@ -134,7 +183,6 @@ class EditContactFragment : Fragment() {
             Manifest.permission.CAMERA)
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Permission to record denied")
             makeRequest()
         }
     }
@@ -147,6 +195,11 @@ class EditContactFragment : Fragment() {
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
+        super
+            .onRequestPermissionsResult(requestCode,
+                permissions,
+                grantResults)
+
         when (requestCode) {
             CAMERA_REQUEST_CODE -> {
 
@@ -224,12 +277,24 @@ class EditContactFragment : Fragment() {
         }
     }
 
-    private fun saveReminderToPrefs(day: Int, month: Int, year: Int){
-        val editor: SharedPreferences.Editor = sharedPref.edit()
-        editor.putInt(DAY, day)
-        editor.putInt(MONTH, month)
-        editor.putInt(YEAR, year)
-        editor.commit()
+    private fun createChannel(channelId: String, channelName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_LOW
+            )
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = "Time for call"
+
+            val notificationManager = requireActivity().getSystemService(
+                NotificationManager::class.java
+            )
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 
     private fun navigateToContactsFragment(_state: Boolean) {

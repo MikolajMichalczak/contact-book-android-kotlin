@@ -1,14 +1,15 @@
 package com.example.contactbook.database
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.contactbook.database.converters.Converters
+import com.example.contactbook.database.daos.CallRemindersDao
 import com.example.contactbook.database.daos.ContactsDao
 import com.example.contactbook.database.daos.ContactsExtrasDao
 import com.example.contactbook.database.daos.RepositoriesDao
+import com.example.contactbook.database.entities.CallReminder
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.database.entities.Repository
@@ -16,12 +17,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-@Database(entities = [Contact::class, ContactExtras::class, Repository::class], version = 1, exportSchema = false)
+@Database(entities = [Contact::class, ContactExtras::class, Repository::class, CallReminder::class], version = 1, exportSchema = false)
+@TypeConverters(Converters::class)
 public abstract class ContactsRoomDatabase : RoomDatabase() {
 
     abstract fun contactsDao(): ContactsDao
     abstract fun contactsExtrasDao(): ContactsExtrasDao
-    abstract  fun repositoriesDao(): RepositoriesDao
+    abstract fun repositoriesDao(): RepositoriesDao
+    abstract fun callRemindersDao(): CallRemindersDao
 
 //    private class ContactsDatabaseCallback(
 //        private val scope: CoroutineScope

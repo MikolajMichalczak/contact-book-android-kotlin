@@ -12,12 +12,8 @@ import kotlinx.android.synthetic.main.fragment_contacts.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var viewPager: ViewPager2? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
     }
-
 }

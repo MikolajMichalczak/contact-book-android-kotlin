@@ -40,14 +40,9 @@ class RepositoryViewModel (application: Application) : AndroidViewModel(applicat
     )
 
     init {
-        val contactsDao =
-            ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsDao()
-        val contactsExtrasDao =
-            ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsExtrasDao()
-        val repositoriesDao =
-            ContactsRoomDatabase.getDatabase(application, viewModelScope).repositoriesDao()
+        val database = ContactsRoomDatabase.getDatabase(application, viewModelScope)
         val service = RepoApi.retrofitService
-        repository = ContactsRepository(contactsDao, contactsExtrasDao, repositoriesDao, service)
+        repository = ContactsRepository(database ,service)
 
         initializePageList(application)
     }

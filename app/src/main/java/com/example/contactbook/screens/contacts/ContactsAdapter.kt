@@ -30,7 +30,7 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
         }
 
         override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean {
-            return  oldItem.id == newItem.id
+            return  oldItem.contactId == newItem.contactId
         }
     }
 
@@ -82,11 +82,11 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
         }
 
         private fun chooseExtras(contact: Contact) {
-            extras = extrasList.filter{it.contactOwnerId == contact.id}
+            extras = extrasList.filter{it.contactOwnerId == contact.contactId}
         }
 
         fun bind(contact: Contact) {
-            binding.contactName.tag = contact.id
+            binding.contactName.tag = contact.contactId
             binding.contactName.text = contact.name
             binding.contactNumber.text = contact.number
             if(contact.imageUri.isBlank()){

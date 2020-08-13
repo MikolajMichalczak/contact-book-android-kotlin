@@ -14,4 +14,10 @@
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="submit">Submit</string>
+    <string name="call_notification_title">You have a call scheduled</string>
+    <string name="call_notification_subtitle">You should call to %1$s</string>
+    <string name="call_notification_error">Can not do notification</string>
+    <string name="call_notification_channel_id">call_channel</string>
+    <string name="call_notification_channel_name">"Call Reminder "</string>
+    <string name="invalid_date">Invalid date - too short delay</string>
 </resources>

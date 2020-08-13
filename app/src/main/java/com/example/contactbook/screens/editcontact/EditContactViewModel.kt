@@ -1,38 +1,43 @@
 package com.example.contactbook.screens.editcontact
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
-import android.net.Uri
+import android.os.Build
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.example.contactbook.database.entities.Contact
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.*
+import androidx.work.*
 import com.example.contactbook.database.ContactsRepository
 import com.example.contactbook.database.ContactsRoomDatabase
+import com.example.contactbook.database.entities.CallReminder
+import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
+import com.example.contactbook.database.entities.combined.ContactAndCallReminder
 import com.example.contactbook.network.RepoApi
-import com.example.contactbook.screens.repository.RepositoryViewModel
+import com.example.contactbook.workers.NotifyWorker
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.*
+import java.util.concurrent.TimeUnit
+
 
 
 class EditContactViewModel(application: Application, _contact: Contact) : AndroidViewModel(application) {
 
     companion object{
         private const val TAG = "EditContactViewModel"
-        private const val PREFS_NAME = "CallReminders"
-        private const val DAY = "Day"
-        private const val MONTH = "Month"
-        private const val YEAR = "Year"
-
+        private const val ID = "worker_id_data"
+        private const val NAME = "worker_name_data"
+        private const val WORKER_REQUEST_TAG = "worker_notify_request"
     }
 
-    private val sharedPref: SharedPreferences = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
+    private val app = application
+    val workManager = WorkManager.getInstance(app)
     private val repository: ContactsRepository
+    private val calendar = Calendar.getInstance()
+
     var contact = _contact
     var nameText:String = ""
     var numberText:String = ""
@@ -41,21 +46,21 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
     val toContactsFragment: LiveData<Boolean>
     get() = _toContactsFragment
 
+    private var _invalidDate = MutableLiveData<Boolean>(false)
+    val invalidDate: LiveData<Boolean>
+        get() = _invalidDate
+
     var _imageUri = MutableLiveData<String>()
     val imageUri: LiveData<String>
         get() = _imageUri
 
-    var _callReminderData = MutableLiveData<List<Int>>()
-    val callReminderData: LiveData<List<Int>>
-        get() = _callReminderData
-
+    var callReminderAndContactData: LiveData<ContactAndCallReminder>
+    val outputWorkInfos: LiveData<List<WorkInfo>>
 
     init {
-        val contactsDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsDao()
-        val contactsExtrasDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).contactsExtrasDao()
-        val repositoriesDao = ContactsRoomDatabase.getDatabase(application, viewModelScope).repositoriesDao()
+        val database = ContactsRoomDatabase.getDatabase(app, viewModelScope)
         val service = RepoApi.retrofitService
-        repository = ContactsRepository(contactsDao, contactsExtrasDao, repositoriesDao, service)
+        repository = ContactsRepository(database ,service)
         if(contact.name.isNotEmpty()) {
             nameText = _contact.name
             numberText = contact.number
@@ -64,9 +69,8 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
         else{
             _imageUri.value = ""
         }
-
-        initSharedPref()
-
+        callReminderAndContactData = repository.getContactAndCallReminderById(contact.contactId)
+        outputWorkInfos = workManager.getWorkInfosByTagLiveData(WORKER_REQUEST_TAG)
     }
 
     fun updateContact(){
@@ -104,11 +108,49 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
     }
 
     private fun insert(contact: Contact) = viewModelScope.launch(Dispatchers.IO) {
-        val contactID =  repository.insert(contact)
-        //Log.i(TAG,contact.id.toString())
+        val contactID =  repository.insertContact(contact)
         repository.insertExtras(ContactExtras(0, "","", contactID))
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun saveReminder(dayTime: LocalDateTime){
+        val zoneId = ZoneId.of("Europe/Warsaw")
+        val pickerTime = dayTime.atZone(zoneId).toEpochSecond()*1000 //to millis
+        val delay = pickerTime - calendar.timeInMillis
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(delay)
+        Log.i(TAG, minutes.toString())
+        if(minutes>0) {
+
+            val newReminder = CallReminder(0, dayTime, contact.contactId)
+            CoroutineScope(Dispatchers.IO).launch {
+                repository.insertReminder(newReminder)
+            }
+
+            startNotifyWorker(minutes, contact.contactId, contact.name)
+        }
+        else
+            _invalidDate.value = true
+    }
+
+    private fun startNotifyWorker(minutes: Long, contactId: Int, contactName: String){
+        val data = Data.Builder()
+        data.putInt(ID, contactId)
+        data.putString(NAME, contactName)
+
+        val notificationWorkRequest = OneTimeWorkRequest.Builder(NotifyWorker::class.java)
+            .setInitialDelay(minutes, TimeUnit.MINUTES)
+            .addTag(contact.contactId.toString())
+            .setInputData(data.build())
+            .build()
+            workManager.enqueueUniqueWork(contact.contactId.toString(), ExistingWorkPolicy.APPEND, notificationWorkRequest)
+    }
+
+    fun deleteReminder(){
+        workManager.cancelAllWorkByTag(contact.contactId.toString())
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.deleteReminderByContactId(contact.contactId)
+        }
+    }
 
     private fun toContactsFragment(){
         _toContactsFragment.value = true
@@ -118,9 +160,8 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
         _toContactsFragment.value = false
     }
 
-    fun initSharedPref(){
-        val reminderDataList = listOf(sharedPref.getInt(DAY, 0), sharedPref.getInt(MONTH, 0), sharedPref.getInt(YEAR, 0))
-        _callReminderData.value = reminderDataList
+    fun changeInvalidDateVariableState(){
+        _invalidDate.value = false
     }
 
 }

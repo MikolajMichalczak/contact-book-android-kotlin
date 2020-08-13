@@ -5,51 +5,58 @@ import androidx.paging.DataSource
 import com.example.contactbook.database.daos.ContactsDao
 import com.example.contactbook.database.daos.ContactsExtrasDao
 import com.example.contactbook.database.daos.RepositoriesDao
+import com.example.contactbook.database.entities.CallReminder
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.database.entities.Repository
+import com.example.contactbook.database.entities.combined.ContactAndCallReminder
 import com.example.contactbook.network.RepoApiService
 
-class ContactsRepository (private val contactsDao: ContactsDao, private val contactsExtrasDao: ContactsExtrasDao, private val repositoriesDao: RepositoriesDao, private val service: RepoApiService) {
+class ContactsRepository (private val database: ContactsRoomDatabase, private val service: RepoApiService) {
 
-    val allContacts: LiveData<List<Contact>> = contactsDao.getNames()
-    val allContactsExtras: LiveData<List<ContactExtras>> = contactsExtrasDao.getExtras()
+    val allContacts: LiveData<List<Contact>> = database.contactsDao().getNames()
+    val allContactsExtras: LiveData<List<ContactExtras>> = database.contactsExtrasDao().getExtras()
+    //val Reminder: LiveData<CallReminder> = database.callRemindersDao().getReminder(name = String())
 
     //contacts
     /**
      * @return Id of inserted Contact
      */
-    suspend fun insert(contact: Contact): Int{
-        return contactsDao.insert(contact).toInt()
+    suspend fun insertContact(contact: Contact): Int{
+        return database.contactsDao().insert(contact).toInt()
+    }
+
+    suspend fun getContactById(contactId: Int): Contact{
+        return database.contactsDao().getContactById(contactId)
     }
 
     suspend fun deleteAll() {
-        contactsDao.deleteAll()
+        database.contactsDao().deleteAll()
     }
 
     fun deleteContact(contact: Contact) {
-        contactsDao.deleteContact(contact)
+        database.contactsDao().deleteContact(contact)
     }
 
     fun updateContact(contact: Contact) {
-        contactsDao.updateContact(contact)
+        database.contactsDao().updateContact(contact)
     }
 
     //contactsExtras
     suspend fun insertExtras(contactExtras: ContactExtras) {
-        contactsExtrasDao.insertExtras(contactExtras)
+        database.contactsExtrasDao().insertExtras(contactExtras)
     }
 
     suspend fun deleteAllExtras() {
-        contactsExtrasDao.deleteAllExtras()
+        database.contactsExtrasDao().deleteAllExtras()
     }
 
     fun deleteContactExtras(contactExtras: ContactExtras) {
-        contactsExtrasDao.deleteContactExtras(contactExtras)
+        database.contactsExtrasDao().deleteContactExtras(contactExtras)
     }
 
     fun updateContactExtras(contactExtras: ContactExtras) {
-        contactsExtrasDao.updateContactExtras(contactExtras)
+        database.contactsExtrasDao().updateContactExtras(contactExtras)
     }
 
     //Repositories
@@ -60,30 +67,63 @@ class ContactsRepository (private val contactsDao: ContactsDao, private val cont
 
 
     fun getSearchedRepos(name: String): DataSource.Factory<Int, Repository> {
-        return repositoriesDao.getSearchedRepos(name)
+        return database.repositoriesDao().getSearchedRepos(name)
     }
 
     fun getPagedRepos(): DataSource.Factory<Int, Repository> {
-        return repositoriesDao.getPagedRepos()
+        return database.repositoriesDao().getPagedRepos()
     }
 
     suspend fun insertRepo(repository: Repository) {
-        repositoriesDao.insertRepo(repository)
+        database.repositoriesDao().insertRepo(repository)
     }
 
     suspend fun insertRepos(repositories: Iterable<Repository>) {
-        repositoriesDao.insertRepos(repositories)
+        database.repositoriesDao().insertRepos(repositories)
     }
 
     suspend fun deleteAllRepos() {
-        repositoriesDao.deleteAllRepos()
+        database.repositoriesDao().deleteAllRepos()
     }
 
     fun deleteRepo(repository: Repository) {
-        repositoriesDao.deleteRepo(repository)
+        database.repositoriesDao().deleteRepo(repository)
     }
 
     fun updateRepo(repository: Repository) {
-        repositoriesDao.updateRepo(repository)
+        database.repositoriesDao().updateRepo(repository)
     }
+
+    //CallReminders
+
+    fun getReminder(contactId: Int): LiveData<CallReminder> {
+         return database.callRemindersDao().getReminder(contactId)
+    }
+
+    suspend fun insertReminder(reminder: CallReminder) {
+        database.callRemindersDao().insert(reminder)
+    }
+
+    suspend fun deleteAllReminders() {
+        database.callRemindersDao().deleteAll()
+    }
+
+    //ContactAndCallReminder
+
+    fun getContactsAndCallReminder(): LiveData<List<ContactAndCallReminder>> {
+        return database.contactsDao().getContactsAndCallReminder()
+    }
+
+    fun getContactAndCallReminderById(id: Int): LiveData<ContactAndCallReminder> {
+        return database.contactsDao().getContactAndCallReminderById(id)
+    }
+
+    fun deleteReminder(callReminder: CallReminder){
+        database.callRemindersDao().deleteReminder(callReminder)
+    }
+
+    fun deleteReminderByContactId(contactId: Int){
+        database.callRemindersDao().deleteReminderBYContactId(contactId)
+    }
+
 }
