@@ -20,6 +20,7 @@ import com.example.contactbook.R
 import com.example.contactbook.SwipeToDeleteCallback
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.databinding.FragmentContactsBinding
+import com.example.contactbook.util.hideKeyboard
 
 class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -209,12 +210,12 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
         }
     }
 
-//    override fun onPause() {
-////        super.onPause()
-////        val searchItem = menu.findItem(R.id.action_search)
-////        val searchView: SearchView = searchItem.actionView as SearchView
-////        searchView.onActionViewCollapsed()
-//    }
+    override fun onPause() {
+        super.onPause()
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.onActionViewCollapsed()
+    }
 
 }
 

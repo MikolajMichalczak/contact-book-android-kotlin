@@ -1,12 +1,18 @@
 package com.example.contactbook.screens.contacts
 
 import android.Manifest
-import android.app.*
-import android.content.Context
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION
+import android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE
+import android.media.RingtoneManager.TYPE_NOTIFICATION
+import android.media.RingtoneManager.getDefaultUri
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -15,6 +21,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -33,6 +40,7 @@ import com.example.contactbook.databinding.FragmentEditContactBinding
 import com.example.contactbook.dialogs.DateAndTimeDialogFragment
 import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
+import com.example.contactbook.util.hideKeyboard
 import com.squareup.picasso.Picasso
 import java.io.File
 import java.text.SimpleDateFormat
@@ -84,15 +92,6 @@ class EditContactFragment : Fragment() {
         binding.editTextName.setText(contact?.name)
         binding.editTextNumber.setText((contact?.number))
 
-//        viewModel.outputWorkInfos.observe(viewLifecycleOwner, Observer {workStatusList ->
-////            val currentWorkStatus = workStatusList?.getOrNull(0)
-////            if (currentWorkStatus?.state?.isFinished == true) {
-////                //viewModel.deleteReminder()
-////            }
-////            else{
-////                //showProcessFunction
-////            }
-//        })
         viewModel.workManager.getWorkInfosByTagLiveData(contact.contactId.toString())
             .observe(viewLifecycleOwner, Observer { workInfo ->
                 // Check if the current work's state is "successfully finished"
@@ -101,6 +100,17 @@ class EditContactFragment : Fragment() {
                 }
             })
 
+        binding.editTextName.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                hideKeyboard(view, context!!)
+            }
+        }
+
+        binding.editTextNumber.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                hideKeyboard(view, context!!)
+            }
+        }
 
         viewModel.toContactsFragment.observe(viewLifecycleOwner, Observer {state ->
             navigateToContactsFragment(state)
@@ -162,7 +172,7 @@ class EditContactFragment : Fragment() {
         }
 
         binding.callReminderBtn.setOnClickListener {
-            val dialogFragment = DateAndTimeDialogFragment() { dateTime -> Log.i(
+            val dialogFragment = DateAndTimeDialogFragment { dateTime -> Log.i(
                 TAG, dateTime.toString())
                 viewModel.saveReminder(dateTime) }
             dialogFragment.show(activity!!.supportFragmentManager, DateAndTimeDialogFragment.TAG)
@@ -282,13 +292,18 @@ class EditContactFragment : Fragment() {
             val notificationChannel = NotificationChannel(
                 channelId,
                 channelName,
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_HIGH
             )
+
+            val ringtoneManager = getDefaultUri(TYPE_NOTIFICATION)
+            val audioAttributes = AudioAttributes.Builder().setUsage(USAGE_NOTIFICATION_RINGTONE)
+                .setContentType(CONTENT_TYPE_SONIFICATION).build()
 
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.RED
             notificationChannel.enableVibration(true)
             notificationChannel.description = "Time for call"
+            notificationChannel.setSound(ringtoneManager, audioAttributes)
 
             val notificationManager = requireActivity().getSystemService(
                 NotificationManager::class.java

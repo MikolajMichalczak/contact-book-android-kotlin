@@ -19,6 +19,7 @@ import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
 import com.example.contactbook.screens.extras.ExtrasViewModel
 import com.example.contactbook.screens.extras.ExtrasViewModelFactory
+import com.example.contactbook.util.hideKeyboard
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_contacts.*
 
@@ -54,6 +55,19 @@ class ExtrasFragment : Fragment() {
 
         binding.editTextAddress.setText(contactExtras?.address)
         binding.editTextEmail.setText((contactExtras?.email))
+
+        binding.editTextAddress.setOnFocusChangeListener{ view, hasFocus ->
+            if (!hasFocus) {
+                hideKeyboard(view, context!!)
+            }
+        }
+
+        binding.editTextEmail.setOnFocusChangeListener{ view, hasFocus ->
+            if (!hasFocus) {
+                hideKeyboard(view, context!!)
+            }
+        }
+
 
         viewModel.toContactsFragment.observe(viewLifecycleOwner, Observer {state ->
             navigateToContactsFragment(state)

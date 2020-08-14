@@ -138,7 +138,7 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
         data.putString(NAME, contactName)
 
         val notificationWorkRequest = OneTimeWorkRequest.Builder(NotifyWorker::class.java)
-            .setInitialDelay(minutes, TimeUnit.MINUTES)
+            .setInitialDelay(minutes, TimeUnit.MILLISECONDS)
             .addTag(contact.contactId.toString())
             .setInputData(data.build())
             .build()

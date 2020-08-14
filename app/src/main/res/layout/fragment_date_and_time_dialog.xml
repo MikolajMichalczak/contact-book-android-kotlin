@@ -24,32 +24,50 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
 
-        <TimePicker
-            android:id="@+id/timePicker"
+        <LinearLayout
+            android:id="@+id/timePickerLinearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginRight="24dp"
-            android:timePickerMode="spinner"
+            android:padding="30dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.503"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/timeTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/timeTextView">
+
+            <NumberPicker
+                android:id="@+id/hoursNumberPicker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/dotsTextView"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_margin="6dp"
+                android:gravity="center"
+                android:text="@string/dots_time_picker" />
+
+            <NumberPicker
+                android:id="@+id/minutesNumberPicker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
 
         <Button
-            android:id="@+id/negativeBtn"
+            android:id="@+id/submitBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
             android:text="@string/submit"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/timePicker"
-            app:layout_constraintVertical_bias="0.28" />
+            app:layout_constraintTop_toBottomOf="@+id/timePickerLinearLayout" />
 
         <TextView
             android:id="@+id/dateTextView"
