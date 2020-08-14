@@ -45,10 +45,11 @@
             android:layout_marginRight="32dp"
             android:layout_marginBottom="32dp"
             android:clickable="true"
+            android:onClickListener="@{() -> viewModel.toEditContactFragment()}"
+            app:backgroundTint="@color/colorSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/add_icon"
-            android:onClickListener="@{() -> viewModel.toEditContactFragment()}"/>
+            app:srcCompat="@drawable/add_icon" />
 
 
 

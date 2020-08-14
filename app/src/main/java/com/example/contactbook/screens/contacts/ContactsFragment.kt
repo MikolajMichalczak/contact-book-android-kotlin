@@ -1,13 +1,18 @@
 package com.example.contactbook.screens.contacts
 
+import android.Manifest
 import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
-import androidx.core.view.isNotEmpty
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -20,13 +25,14 @@ import com.example.contactbook.R
 import com.example.contactbook.SwipeToDeleteCallback
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.databinding.FragmentContactsBinding
-import com.example.contactbook.util.hideKeyboard
+
 
 class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
 
     companion object{
         private const val TAG = "ContactsFragment"
         private val CONTACT_ID = "contact_id"
+        private const val CALL_PHONE_REQUEST = 1
     }
 
     private lateinit var viewModel: ContactsViewModel
@@ -149,6 +155,10 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
                     }
                 }
                 builder.show()
+            },
+
+            callListener = {
+                makePhoneCall(it.number)
             }
         )
 
@@ -207,6 +217,19 @@ class ContactsFragment : Fragment(), SearchView.OnQueryTextListener {
                 R.id.action_pageContainerFragment_to_editContactFragment,bundle
             )
             viewModel.endNavigateToEditContactFragment()
+        }
+    }
+
+    private fun makePhoneCall(number: String){
+
+        val phoneIntent = Intent(Intent.ACTION_CALL)
+        phoneIntent.data = Uri.parse(
+            "tel:$number"
+        )
+        if (ActivityCompat.checkSelfPermission(context!!, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), CALL_PHONE_REQUEST)
+        } else {
+            startActivity(phoneIntent)
         }
     }
 

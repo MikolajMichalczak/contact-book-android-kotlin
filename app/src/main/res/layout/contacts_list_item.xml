@@ -54,14 +54,18 @@
 
         <Button
             android:id="@+id/edit_contact_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="53dp"
+            android:layout_height="29dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
+            android:background="@color/colorPrimary"
             android:text="@string/button_edit_contact"
+            android:textColor="@color/white"
+            android:textSize="11dp"
             app:layout_constraintBottom_toBottomOf="@+id/contact_number"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/phoneCallImageView"
             app:layout_constraintTop_toTopOf="@+id/contact_name"
+            app:layout_constraintVertical_bias="0.514"
             tools:text="@string/button_edit_contact" />
 
         <ImageView
@@ -83,13 +87,24 @@
             android:id="@+id/favourite_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/edit_contact_button"
             app:layout_constraintEnd_toStartOf="@+id/edit_contact_button"
             app:layout_constraintTop_toTopOf="@+id/edit_contact_button"
             app:srcCompat="@drawable/star_icon_yellow_24" />
+
+        <ImageView
+            android:id="@+id/phoneCallImageView"
+            android:layout_width="42dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/contact_number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_baseline_call_24" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -55,6 +55,7 @@ class EditContactFragment : Fragment() {
         private const val STORAGEREQUEST_RESULT = 1
         private const val CAMERAREQUEST_RESULT = 0
         private const val CAMERA_REQUEST_CODE = 101
+        private const val CALL_PHONE_REQUEST_CODE = 100
     }
 
     private lateinit var viewModel: EditContactViewModel
@@ -70,8 +71,6 @@ class EditContactFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_edit_contact, container, false)
-
-            setupPermissions()
 
         contact = arguments?.getParcelable("contact")!!
 
@@ -155,7 +154,11 @@ class EditContactFragment : Fragment() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Where to choose a photo?")
         builder.setPositiveButton("Camera") { dialog, which ->
-            dispatchTakePictureIntent()
+            if (ActivityCompat.checkSelfPermission(context!!, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), CAMERA_REQUEST_CODE)
+            } else {
+                dispatchTakePictureIntent()
+            }
         }
 
         builder.setNegativeButton("Choose file") { dialog, which ->
@@ -184,45 +187,12 @@ class EditContactFragment : Fragment() {
 
         createChannel(getString(R.string.call_notification_channel_id), getString(R.string.call_notification_channel_name))
 
+        binding.phoneCallImageView.setOnClickListener {
+            makePhoneCall(contact.number)
+        }
+
         return binding.root
     }
-
-    private fun setupPermissions() {
-        val permission = ContextCompat.checkSelfPermission(
-            context!!,
-            Manifest.permission.CAMERA)
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            makeRequest()
-        }
-    }
-
-    private fun makeRequest() {
-        ActivityCompat.requestPermissions(requireActivity(),
-            arrayOf(Manifest.permission.CAMERA),
-            CAMERA_REQUEST_CODE)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        super
-            .onRequestPermissionsResult(requestCode,
-                permissions,
-                grantResults)
-
-        when (requestCode) {
-            CAMERA_REQUEST_CODE -> {
-
-                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-
-                    Log.i(TAG, "Permission has been denied by user")
-                } else {
-                    Log.i(TAG, "Permission has been granted by user")
-                }
-            }
-        }
-    }
-
 
     var selectedPhotoUri: Uri? = null
     private var currentPhotoPath: String = ""
@@ -266,11 +236,11 @@ class EditContactFragment : Fragment() {
 
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
-                createImageFile()
+            takePictureIntent.resolveActivity(activity!!.packageManager).also {
                 val photoFile: File? = try {
                     createImageFile()
                 } catch (ex: Exception) {
+                    Log.i(TAG, ex.toString())
                     null
                 }
                 // Continue only if the File was successfully created
@@ -281,7 +251,7 @@ class EditContactFragment : Fragment() {
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    startActivityForResult(takePictureIntent, 0)
+                    startActivityForResult(takePictureIntent, CAMERAREQUEST_RESULT)
                 }
             }
         }
@@ -309,6 +279,20 @@ class EditContactFragment : Fragment() {
                 NotificationManager::class.java
             )
             notificationManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    private fun makePhoneCall(number: String){
+
+        val phoneIntent = Intent(Intent.ACTION_CALL)
+        phoneIntent.data = Uri.parse(
+            "tel:$number"
+        )
+        if (ActivityCompat.checkSelfPermission(context!!, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), CALL_PHONE_REQUEST_CODE
+            )
+        } else {
+            startActivity(phoneIntent)
         }
     }
 

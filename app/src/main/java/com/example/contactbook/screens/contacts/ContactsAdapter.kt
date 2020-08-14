@@ -17,7 +17,7 @@ import com.example.contactbook.databinding.ContactsListItemBinding
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.contacts_list_item.view.*
 
-class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener: (Contact) -> Unit, val longListener: (Contact) -> Unit)
+class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener: (Contact) -> Unit, val longListener: (Contact) -> Unit, val callListener: (Contact) -> Unit)
     : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
 
@@ -112,10 +112,12 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
                 (adapter as ContactsExtrasAdapter).setList(extras)
             }
 
-            binding.editContactButton.setOnClickListener(){
+            binding.editContactButton.setOnClickListener{
                 listener(contact)
             }
-
+            binding.phoneCallImageView.setOnClickListener{
+                callListener(contact)
+            }
         }
 
         override fun onClick(p0: View?) {
