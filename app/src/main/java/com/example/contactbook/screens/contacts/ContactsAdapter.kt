@@ -14,6 +14,7 @@ import com.example.contactbook.R
 import com.example.contactbook.database.entities.Contact
 import com.example.contactbook.database.entities.ContactExtras
 import com.example.contactbook.databinding.ContactsListItemBinding
+import com.example.contactbook.util.CircleTransform
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.contacts_list_item.view.*
 
@@ -92,8 +93,12 @@ class ContactsAdapter(val listenerExtras: (ContactExtras) -> Unit, val listener:
             if(contact.imageUri.isBlank()){
                 binding.contactImageView.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.person_icon_24))
             }
-            else
-                Picasso.get().load(Uri.parse(contact.imageUri)).placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24).into(binding.contactImageView)
+            else {
+                //Picasso.get().isLoggingEnabled = true
+                Picasso.get().load(Uri.parse(contact.imageUri))
+                    .placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24)
+                    .transform(CircleTransform()).into(binding.contactImageView)
+            }
             if(contact.favourite == 1)
                 binding.favouriteImage.visibility = View.VISIBLE
             else

@@ -40,6 +40,7 @@ import com.example.contactbook.databinding.FragmentEditContactBinding
 import com.example.contactbook.dialogs.DateAndTimeDialogFragment
 import com.example.contactbook.screens.editcontact.EditContactViewModel
 import com.example.contactbook.screens.editcontact.EditContactViewModelFactory
+import com.example.contactbook.util.CircleTransform
 import com.example.contactbook.util.hideKeyboard
 import com.squareup.picasso.Picasso
 import java.io.File
@@ -125,8 +126,11 @@ class EditContactFragment : Fragment() {
         viewModel.imageUri.observe(viewLifecycleOwner, Observer {uri ->
             if(uri.isBlank())
                 binding.contactImageView.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.person_icon_24))
-            else
-                Picasso.get().load(uri).placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24).into(binding.contactImageView)
+            else {
+                Log.i(TAG, uri.toString())
+                Picasso.get().load(uri).placeholder(R.drawable.person_icon_24)
+                    .error(R.drawable.person_icon_24) .transform(CircleTransform()).into(binding.contactImageView)
+            }
         })
 
         viewModel.callButtonVisibility.observe(viewLifecycleOwner, Observer {state ->
@@ -169,6 +173,8 @@ class EditContactFragment : Fragment() {
         builder.setNegativeButton("Choose file") { dialog, which ->
             val takePictureIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             takePictureIntent.type = "image/*"
+//            takePictureIntent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+//            takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             startActivityForResult(
                 takePictureIntent,
                 1
@@ -202,26 +208,29 @@ class EditContactFragment : Fragment() {
     var selectedPhotoUri: Uri? = null
     private var currentPhotoPath: String = ""
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == CAMERAREQUEST_RESULT) {
             Log.i(TAG, currentPhotoPath)
             selectedPhotoUri = Uri.fromFile(File(currentPhotoPath))
-            Picasso.get().load(selectedPhotoUri).into(binding.contactImageView)
+            Picasso.get().load(selectedPhotoUri).transform(CircleTransform()).into(binding.contactImageView)
             viewModel._imageUri.value = selectedPhotoUri.toString()
         }
 
         if(requestCode == STORAGEREQUEST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
             selectedPhotoUri = data.data
+            val takeFlags = data.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            activity!!.contentResolver.takePersistableUriPermission(selectedPhotoUri!!, takeFlags)
             //Log.i(TAG, selectedPhotoUri.toString())
             Picasso.get().load(selectedPhotoUri).fit().centerCrop()
-                .placeholder(R.drawable.person_icon_24).into(binding.contactImageView)
+                .placeholder(R.drawable.person_icon_24).transform(CircleTransform()).into(binding.contactImageView)
             viewModel._imageUri.value = selectedPhotoUri.toString()
         }
         else if(resultCode == Activity.RESULT_CANCELED ){
             Picasso.get().load(Uri.parse(contact.imageUri)).fit().centerCrop()
-                .placeholder(R.drawable.person_icon_24).into(binding.contactImageView)
+                .placeholder(R.drawable.person_icon_24).transform(CircleTransform()).into(binding.contactImageView)
             viewModel._imageUri.value = contact.imageUri
         }
     }

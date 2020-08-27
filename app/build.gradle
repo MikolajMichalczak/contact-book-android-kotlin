@@ -80,6 +80,8 @@ dependencies {
 
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
+    //Picasso transformation https://github.com/wasabeef/picasso-transformations
+    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
