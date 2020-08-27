@@ -54,6 +54,10 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
     val imageUri: LiveData<String>
         get() = _imageUri
 
+    var _callButtonVisibility = MutableLiveData<Boolean>(false)
+    val callButtonVisibility: LiveData<Boolean>
+        get() = _callButtonVisibility
+
     var callReminderAndContactData: LiveData<ContactAndCallReminder>
     val outputWorkInfos: LiveData<List<WorkInfo>>
 
@@ -62,9 +66,7 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
         val service = RepoApi.retrofitService
         repository = ContactsRepository(database ,service)
         if(contact.name.isNotEmpty()) {
-            nameText = _contact.name
-            numberText = contact.number
-            _imageUri.value = contact.imageUri
+            setLayout()
         }
         else{
             _imageUri.value = ""
@@ -143,6 +145,13 @@ class EditContactViewModel(application: Application, _contact: Contact) : Androi
             .setInputData(data.build())
             .build()
             workManager.enqueueUniqueWork(contact.contactId.toString(), ExistingWorkPolicy.APPEND, notificationWorkRequest)
+    }
+
+    private fun setLayout(){
+        nameText = contact.name
+        numberText = contact.number
+        _imageUri.value = contact.imageUri
+        _callButtonVisibility.value = true
     }
 
     fun deleteReminder(){

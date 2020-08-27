@@ -129,6 +129,11 @@ class EditContactFragment : Fragment() {
                 Picasso.get().load(uri).placeholder(R.drawable.person_icon_24).error(R.drawable.person_icon_24).into(binding.contactImageView)
         })
 
+        viewModel.callButtonVisibility.observe(viewLifecycleOwner, Observer {state ->
+            if(state)
+                binding.phoneCallImageView.visibility = View.VISIBLE
+        })
+
         viewModel.callReminderAndContactData.observe(viewLifecycleOwner, Observer { contactAndReminder ->
             if(contactAndReminder == null) {
                 binding.callReminderTextView.text = resources.getString(R.string.set_reminder)

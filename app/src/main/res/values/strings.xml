@@ -21,4 +21,11 @@
     <string name="call_notification_channel_name">"Call Reminder "</string>
     <string name="invalid_date">Invalid date - too short delay</string>
     <string name="dots_time_picker">:</string>
+    <string name="name">Name</string>
+    <string name="number">Number</string>
+    <string name="contact_image_desc">Contact image</string>
+    <string name="reminder_btn_image_desc">Call reminder button</string>
+    <string name="delete_reminder_btn_desc">Delete call reminder</string>
+    <string name="phone_call_image_btn_desc">Phone call button</string>
+    <string name="edit_contact_btn_desc">Edit contact button</string>
 </resources>

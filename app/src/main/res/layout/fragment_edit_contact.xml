@@ -13,119 +13,127 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:clickable="true"
-        android:focusableInTouchMode="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".screens.editcontact.EditContactFragment">
-
-
-        <EditText
-            android:id="@+id/editTextName"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:hint="Name"
-            android:text="@={viewModel.nameText}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:clickable="true"
+            android:focusableInTouchMode="true"
+            tools:context=".screens.editcontact.EditContactFragment">
 
-        <EditText
-            android:id="@+id/editTextNumber"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="28dp"
-            android:ems="10"
-            android:inputType="numberDecimal"
-            android:text="@={viewModel.numberText}"
-            android:hint="Number"
-            app:layout_constraintBottom_toTopOf="@+id/editTextName"
-            app:layout_constraintEnd_toEndOf="@+id/editTextName"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/editTextName" />
 
-        <Button
-            android:id="@+id/addContact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:onClickListener="@{() -> viewModel.updateContact()}"
-            android:padding="15dp"
-            android:text="@string/update_contact"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/phoneCallImageView" />
-
-        <ImageView
-            android:id="@+id/contact_image_view"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginBottom="32dp"
-            android:scaleType="centerCrop"
-            android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@+id/editTextNumber"
-            app:layout_constraintEnd_toEndOf="@+id/editTextNumber"
-            app:layout_constraintStart_toStartOf="@+id/editTextNumber"
-            app:srcCompat="@drawable/person_icon_24" />
-
-        <LinearLayout
-            android:id="@+id/reminderLinearLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextName"
-            tools:visibility="visible">
-
-            <TextView
-                android:id="@+id/callReminderTextView"
+            <EditText
+                android:id="@+id/editTextName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:text="@string/set_reminder"
-                android:textSize="15sp" />
+                android:layout_marginBottom="32dp"
+                android:autofillHints="Name"
+                android:ems="10"
+                android:hint="@string/name"
+                android:inputType="textPersonName"
+                android:text="@={viewModel.nameText}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/editTextNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="28dp"
+                android:autofillHints="Number"
+                android:ems="10"
+                android:hint="@string/number"
+                android:inputType="numberDecimal"
+                android:text="@={viewModel.numberText}"
+                app:layout_constraintBottom_toTopOf="@+id/editTextName"
+                app:layout_constraintEnd_toEndOf="@+id/editTextName"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/editTextName" />
+
+            <Button
+                android:id="@+id/addContact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button"
+                android:onClickListener="@{() -> viewModel.updateContact()}"
+                android:padding="15dp"
+                android:text="@string/update_contact"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/phoneCallImageView" />
 
             <ImageView
-                android:id="@+id/callReminderBtn"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                app:srcCompat="@drawable/notifications_icon_24" />
+                android:id="@+id/contact_image_view"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="32dp"
+                android:contentDescription="@string/contact_image_desc"
+                android:scaleType="centerCrop"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@+id/editTextNumber"
+                app:layout_constraintEnd_toEndOf="@+id/editTextNumber"
+                app:layout_constraintStart_toStartOf="@+id/editTextNumber"
+                app:srcCompat="@drawable/person_icon_24" />
 
-            <ImageView
-                android:id="@+id/deleteCallReminderBtn"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+            <LinearLayout
+                android:id="@+id/reminderLinearLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
                 android:visibility="gone"
-                app:srcCompat="@drawable/delete_icon_24" />
-        </LinearLayout>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextName"
+                tools:visibility="visible">
 
-        <ImageView
-            android:id="@+id/phoneCallImageView"
-            android:layout_width="70dp"
-            android:layout_height="64dp"
-            android:layout_marginTop="32dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/reminderLinearLayout"
-            app:srcCompat="@drawable/ic_baseline_call_24" />
+                <TextView
+                    android:id="@+id/callReminderTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:text="@string/set_reminder"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:id="@+id/callReminderBtn"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:contentDescription="@string/reminder_btn_image_desc"
+                    app:srcCompat="@drawable/notifications_icon_24" />
+
+                <ImageView
+                    android:id="@+id/deleteCallReminderBtn"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:contentDescription="@string/delete_reminder_btn_desc"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/delete_icon_24" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/phoneCallImageView"
+                android:layout_width="67dp"
+                android:layout_height="62dp"
+                android:layout_marginTop="32dp"
+                android:contentDescription="@string/phone_call_image_btn_desc"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/reminderLinearLayout"
+                app:srcCompat="@drawable/ic_baseline_call_24"
+                tools:visibility="visible" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
 </layout>
