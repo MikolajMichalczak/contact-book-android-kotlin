@@ -28,4 +28,6 @@
     <string name="delete_reminder_btn_desc">Delete call reminder</string>
     <string name="phone_call_image_btn_desc">Phone call button</string>
     <string name="edit_contact_btn_desc">Edit contact button</string>
+    <string name="address">Address:</string>
+    <string name="email">Email:</string>
 </resources>

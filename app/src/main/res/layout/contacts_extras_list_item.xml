@@ -13,14 +13,28 @@
         android:layout_height="wrap_content"
         tools:context=".screens.contacts.ContactsAdapter">
 
+        <View
+            android:id="@+id/lineDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_margin="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintBottom_toTopOf="@+id/contact_address"
+            app:layout_constraintEnd_toEndOf="@+id/contact_address"
+            app:layout_constraintStart_toStartOf="@+id/contact_address"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/contact_address"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="20dp"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:padding="5dp"
-            android:text="Address:"
+            android:text="@string/address"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +45,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="Email:"
+            android:text="@string/email"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="@+id/contact_address"
             app:layout_constraintHorizontal_bias="0.0"
